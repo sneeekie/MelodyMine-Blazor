@@ -1,12 +1,9 @@
+using System.Text.Json.Serialization;
 using AutoMapper;
-using BLL.Repositories.Implementations;
-using BLL.Repositories.Interfaces;
-using BLL.Services.Implementations;
-using BLL.Services.Interfaces;
+using BLL.Interfaces;
 using DAL;
-using DAL.Entities;
-using BLL.DTOs;
 using BLL.Mapping;
+using BLL.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,11 +15,18 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddDbContext<EfDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IVinylService, VinylService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
-builder.Services.AddScoped<ITemplateRepository<Template>, TemplateRepository<Template>>();
-builder.Services.AddScoped<ITemplateService<TemplateDto>, TemplateService<Template, TemplateDto>>();
 
-builder.Services.AddControllers();
+//builder.Services.AddScoped<ITemplateRepository<Template>, TemplateRepository<Template>>();
+//builder.Services.AddScoped<ITemplateService<TemplateDto>, TemplateService<Template, TemplateDto>>();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
