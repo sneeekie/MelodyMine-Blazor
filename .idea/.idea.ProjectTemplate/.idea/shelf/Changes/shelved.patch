@@ -1,0 +1,1564 @@
+Index: .idea/.idea.ProjectTemplate/.idea/.gitignore
+===================================================================
+diff --git a/.idea/.idea.ProjectTemplate/.idea/.gitignore b/.idea/.idea.ProjectTemplate/.idea/.gitignore
+deleted file mode 100644
+--- a/.idea/.idea.ProjectTemplate/.idea/.gitignore	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ /dev/null	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
+@@ -1,13 +0,0 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
+-# Rider ignored files
+-/modules.xml
+-/contentModel.xml
+-/.idea.Project-Template.iml
+-/projectSettingsUpdater.xml
+-# Editor-based HTTP Client requests
+-/httpRequests/
+-# Datasource local storage ignored files
+-/dataSources/
+-/dataSources.local.xml
+Index: .idea/.idea.ProjectTemplate/.idea/encodings.xml
+===================================================================
+diff --git a/.idea/.idea.ProjectTemplate/.idea/encodings.xml b/.idea/.idea.ProjectTemplate/.idea/encodings.xml
+deleted file mode 100644
+--- a/.idea/.idea.ProjectTemplate/.idea/encodings.xml	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ /dev/null	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
+@@ -1,4 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="Encoding" addBOMForNewFiles="with BOM under Windows, with no BOM otherwise" />
+-</project>
+\ No newline at end of file
+Index: .idea/.idea.ProjectTemplate/.idea/indexLayout.xml
+===================================================================
+diff --git a/.idea/.idea.ProjectTemplate/.idea/indexLayout.xml b/.idea/.idea.ProjectTemplate/.idea/indexLayout.xml
+deleted file mode 100644
+--- a/.idea/.idea.ProjectTemplate/.idea/indexLayout.xml	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ /dev/null	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
+@@ -1,8 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="UserContentModel">
+-    <attachedFolders />
+-    <explicitIncludes />
+-    <explicitExcludes />
+-  </component>
+-</project>
+\ No newline at end of file
+Index: BLL/Repositories/Interfaces/ITemplateRepository.cs
+===================================================================
+diff --git a/BLL/Repositories/Interfaces/ITemplateRepository.cs b/BLL/Repositories/Interfaces/ITemplateRepository.cs
+deleted file mode 100644
+--- a/BLL/Repositories/Interfaces/ITemplateRepository.cs	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ /dev/null	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
+@@ -1,10 +0,0 @@
+-namespace BLL.Repositories.Interfaces;
+-
+-public interface ITemplateRepository<TEntity> where TEntity : class
+-{
+-    Task<IEnumerable<TEntity>> GetAllAsync();
+-    Task<TEntity> GetByIdAsync(int id);
+-    Task AddAsync(TEntity entity);
+-    Task UpdateAsync(TEntity entity);
+-    Task DeleteAsync(int id);
+-}
+Index: BLL/Services/Interfaces/ITemplateService.cs
+===================================================================
+diff --git a/BLL/Services/Interfaces/ITemplateService.cs b/BLL/Services/Interfaces/ITemplateService.cs
+deleted file mode 100644
+--- a/BLL/Services/Interfaces/ITemplateService.cs	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ /dev/null	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
+@@ -1,10 +0,0 @@
+-namespace BLL.Services.Interfaces;
+-
+-public interface ITemplateService<TDto> where TDto : class
+-{
+-        Task<IEnumerable<TDto>> GetAllAsync();
+-        Task<TDto> GetByIdAsync(int id);
+-        Task AddAsync(TDto dto);
+-        Task UpdateAsync(TDto dto);
+-        Task DeleteAsync(int id);
+-}
+Index: BLL/DTOs/TemplateDto.cs
+===================================================================
+diff --git a/BLL/DTOs/TemplateDto.cs b/BLL/DTOs/TemplateDto.cs
+deleted file mode 100644
+--- a/BLL/DTOs/TemplateDto.cs	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ /dev/null	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
+@@ -1,7 +0,0 @@
+-namespace BLL.DTOs;
+-
+-public class TemplateDto
+-{
+-    public int Id { get; set; }
+-    public string Name { get; set; }
+-}
+\ No newline at end of file
+Index: BLL/Repositories/Implementations/TemplateRepository.cs
+===================================================================
+diff --git a/BLL/Repositories/Implementations/TemplateRepository.cs b/BLL/Repositories/Implementations/TemplateRepository.cs
+deleted file mode 100644
+--- a/BLL/Repositories/Implementations/TemplateRepository.cs	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ /dev/null	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
+@@ -1,46 +0,0 @@
+-using Microsoft.EntityFrameworkCore;
+-using DAL;
+-using BLL.Repositories.Interfaces;
+-
+-namespace BLL.Repositories.Implementations;
+-
+-public class TemplateRepository<TEntity> : ITemplateRepository<TEntity> where TEntity : class
+-{
+-    private readonly EfDbContext _context;
+-
+-    public TemplateRepository(EfDbContext context)
+-    {
+-        _context = context;
+-    }
+-
+-    public async Task<IEnumerable<TEntity>> GetAllAsync()
+-    {
+-        return await _context.Set<TEntity>().ToListAsync();
+-    }
+-
+-    public async Task<TEntity> GetByIdAsync(int id)
+-    {
+-        return await _context.Set<TEntity>().FindAsync(id);
+-    }
+-
+-    public async Task AddAsync(TEntity entity)
+-    {
+-        await _context.Set<TEntity>().AddAsync(entity);
+-        await _context.SaveChangesAsync();
+-    }
+-
+-    public async Task UpdateAsync(TEntity entity)
+-    {
+-        _context.Set<TEntity>().Update(entity);
+-        await _context.SaveChangesAsync();
+-    }
+-
+-    public async Task DeleteAsync(int id)
+-    {
+-        var entity = await GetByIdAsync(id);
+-        {
+-            _context.Set<TEntity>().Remove(entity);
+-            await _context.SaveChangesAsync();
+-        }
+-    }   
+-}
+\ No newline at end of file
+Index: BLL/Services/Implementations/TemplateService.cs
+===================================================================
+diff --git a/BLL/Services/Implementations/TemplateService.cs b/BLL/Services/Implementations/TemplateService.cs
+deleted file mode 100644
+--- a/BLL/Services/Implementations/TemplateService.cs	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ /dev/null	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
+@@ -1,49 +0,0 @@
+-using AutoMapper;
+-
+-using BLL.Repositories.Interfaces;
+-using BLL.Services.Interfaces;
+-
+-namespace BLL.Services.Implementations;
+-
+-public class TemplateService<TEntity, TDto> : ITemplateService<TDto>
+-    where TEntity : class
+-    where TDto : class
+-{
+-    private readonly ITemplateRepository<TEntity> _repository;
+-    private readonly IMapper _mapper;
+-
+-    public TemplateService(ITemplateRepository<TEntity> repository, IMapper mapper)
+-    {
+-        _repository = repository;
+-        _mapper = mapper;
+-    }
+-
+-    public async Task<IEnumerable<TDto>> GetAllAsync()
+-    {
+-        var entities = await _repository.GetAllAsync();
+-        return _mapper.Map<IEnumerable<TDto>>(entities);
+-    }
+-
+-    public async Task<TDto> GetByIdAsync(int id)
+-    {
+-        var entity = await _repository.GetByIdAsync(id);
+-        return _mapper.Map<TDto>(entity);
+-    }
+-
+-    public async Task AddAsync(TDto dto)
+-    {
+-        var entity = _mapper.Map<TEntity>(dto);
+-        await _repository.AddAsync(entity);
+-    }
+-
+-    public async Task UpdateAsync(TDto dto)
+-    {
+-        var entity = _mapper.Map<TEntity>(dto);
+-        await _repository.UpdateAsync(entity);
+-    }
+-
+-    public async Task DeleteAsync(int id)
+-    {
+-        await _repository.DeleteAsync(id);
+-    }
+-}
+\ No newline at end of file
+Index: .idea/.idea.ProjectTemplate/.idea/vcs.xml
+===================================================================
+diff --git a/.idea/.idea.ProjectTemplate/.idea/vcs.xml b/.idea/.idea.ProjectTemplate/.idea/vcs.xml
+deleted file mode 100644
+--- a/.idea/.idea.ProjectTemplate/.idea/vcs.xml	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ /dev/null	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
+@@ -1,6 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="VcsDirectoryMappings">
+-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+-  </component>
+-</project>
+\ No newline at end of file
+Index: BLL/Interfaces/IOrderService.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/Interfaces/IOrderService.cs b/BLL/Interfaces/IOrderService.cs
+new file mode 100644
+--- /dev/null	(date 1700134292325)
++++ b/BLL/Interfaces/IOrderService.cs	(date 1700134292325)
+@@ -0,0 +1,28 @@
++using BLL.DTOs;
++using DataLayer.Models;
++
++namespace BLL.Interfaces;
++
++public interface IOrderService
++{
++    public void CreateOrder(Order? order);
++    public void CreateOrderProductDetails(List<OrderProductDetails> orderProductDetails);
++    public int CreateAddress(Address address);
++    public void DeleteOrder(Order? order);
++    public Order? GetSingleOrderBy(int id);
++    public Order GetSingleFullOrderBy(int id);
++    public Order GetSingleOrderBy(string email);
++    public Order GetSingleFullOrderBy(string email);
++    public void UpdateOrderById(int orderId, Order newOrder);
++    public void UpdateOrderByEmail(string orderEmail, Order newOrder);
++    public IQueryable<Order?> GetAllOrders();
++    public IQueryable<Order> GetAllFullOrders();
++    public void UpdateAddress(int addressId, Address newAddress);
++    public void UpdateOrderProductDetails(List<OrderProductDetails> newOrderProductDetails);
++    public bool OrderExists(int id);
++    public OrderDto GetOrderDtoById(int id);
++    public void UpdateOrderDto(OrderDto orderDto);
++    public void UpdateOrderProductDetailsDto(List<OrderProductDetailsDto> orderProductDetailsDtos);
++    public List<OrderProductDetailsDto> GetOrderProductDetailsDtoByOrderId(int orderId);
++    void AddProductDetails(IEnumerable<OrderProductDetails> orderProductDetails);
++}
+\ No newline at end of file
+Index: BLL/Interfaces/IGenreService.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/Interfaces/IGenreService.cs b/BLL/Interfaces/IGenreService.cs
+new file mode 100644
+--- /dev/null	(date 1700134210272)
++++ b/BLL/Interfaces/IGenreService.cs	(date 1700134210272)
+@@ -0,0 +1,16 @@
++using DataLayer.Models;
++
++namespace BLL.Interfaces;
++
++public interface IGenreService
++{
++    public IQueryable<Genre> GetAllGenres();
++    public IQueryable<Genre> GetGenresById(int genreId);
++    public IQueryable<VinylGenre> GetAllVinylGenres();
++    public void CreateVinylGenre(int VinylId, int GenreId);
++    void CreateGenre(Genre genre);
++    void UpdateGenre(Genre genre);
++    Task UpdateVinylGenreLink(int vinylId, int genreId);
++    bool DeleteGenre(int genreId);
++
++}
+\ No newline at end of file
+Index: DAL/EfDbContext.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Design;\nusing Microsoft.Extensions.Logging;\n\nnamespace DAL;\n\npublic class EfDbContextFactory : IDesignTimeDbContextFactory<EfDbContext>\n{\n    public EfDbContext CreateDbContext(string[] args)\n    {\n        \n        var builder = new DbContextOptionsBuilder<EfDbContext>();\n        // Change the connection string to a more generic or configurable one\n        builder.UseNpgsql(\"Host=localhost;Database=MelodyMineDb;Username=Adrian;Password=123456;\");\n        return new EfDbContext(builder.Options);\n    }\n}\n\npublic class EfDbContext : DbContext\n{\n    public EfDbContext(DbContextOptions<EfDbContext> options)\n        : base(options)\n    {\n    }\n\n    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)\n    {\n        if (!optionsBuilder.IsConfigured)\n        {\n            optionsBuilder\n                .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)\n                .EnableSensitiveDataLogging(true)\n                .UseNpgsql(\"Host=localhost;Database=MelodyMineDb;Username=Adrian;Password=123456;\");\n        }\n    }\n\n    // DbSet properties - these should be adapted or made more generic\n    // For example, by using generic methods to add DbSets from outside\n\n    protected override void OnModelCreating(ModelBuilder modelBuilder)\n    {\n        base.OnModelCreating(modelBuilder);\n\n        // Add your model configurations here\n        // For example, relationships and key configurations\n    }\n\n    // Consider adding methods here that allow dynamic addition of DbSets or configurations\n}\n\n// ======================================================================\n// NuGet Package Summary for Future Projects\n// ======================================================================\n//\n// Remember to install the following NuGet packages in future projects:\n//\n// 1. Microsoft.EntityFrameworkCore.Relational\n//    - Essential for projects using relational databases with EF Core.\n//\n// 2. Microsoft.EntityFrameworkCore.Design\n//    - Required for EF Core design-time activities, like migrations.\n//\n// 3. Microsoft.AspNetCore.Identity.EntityFrameworkCore\n//    - Integrates ASP.NET Core Identity with EF Core for user data storage.\n//\n// 4. Npgsql.EntityFrameworkCore.PostgresSQL\n//    - PostgresSQL database provider for EF Core.\n//\n// Including these packages ensures functionality for database operations,\n// identity management, and JSON processing is covered.\n// ======================================================================\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/EfDbContext.cs b/DAL/EfDbContext.cs
+--- a/DAL/EfDbContext.cs	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ b/DAL/EfDbContext.cs	(date 1700129063291)
+@@ -1,3 +1,4 @@
++using DataLayer.Models;
+ using Microsoft.EntityFrameworkCore;
+ using Microsoft.EntityFrameworkCore.Design;
+ using Microsoft.Extensions.Logging;
+@@ -8,9 +9,7 @@
+ {
+     public EfDbContext CreateDbContext(string[] args)
+     {
+-        
+         var builder = new DbContextOptionsBuilder<EfDbContext>();
+-        // Change the connection string to a more generic or configurable one
+         builder.UseNpgsql("Host=localhost;Database=MelodyMineDb;Username=Adrian;Password=123456;");
+         return new EfDbContext(builder.Options);
+     }
+@@ -18,34 +17,122 @@
+ 
+ public class EfDbContext : DbContext
+ {
+-    public EfDbContext(DbContextOptions<EfDbContext> options)
+-        : base(options)
+-    {
+-    }
+-
+     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+     {
+-        if (!optionsBuilder.IsConfigured)
+-        {
+-            optionsBuilder
+-                .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
+-                .EnableSensitiveDataLogging(true)
+-                .UseNpgsql("Host=localhost;Database=MelodyMineDb;Username=Adrian;Password=123456;");
+-        }
++        if (optionsBuilder.IsConfigured)
++            return;
++        
++        optionsBuilder
++            .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
++            .EnableSensitiveDataLogging(true)
++            .UseNpgsql("Host=localhost;Database=MelodyMineDb;Username=Adrian;Password=123456;");
+     }
+-
+-    // DbSet properties - these should be adapted or made more generic
+-    // For example, by using generic methods to add DbSets from outside
++    
++    // DbSet properties
++    public DbSet<Vinyl> Vinyls { get; set; }
++    public DbSet<Genre> Genres { get; set; }
++    public DbSet<Address> Addresses { get; set; }
++    public DbSet<Order?> Orders { get; set; }
++    public DbSet<OrderProductDetails> OrderProductDetails { get; set; }
++    public DbSet<VinylGenre> VinylGenres { get; set; }
+ 
+     protected override void OnModelCreating(ModelBuilder modelBuilder)
+     {
+-        base.OnModelCreating(modelBuilder);
++        modelBuilder.Entity<Order>()
++            .Property(e => e.BuyDate)
++            .HasDefaultValueSql("NOW()");
++        
++        // Configure keys for VinylGenre
++        modelBuilder.Entity<VinylGenre>()
++            .HasKey(vg => new { vg.VinylId, vg.GenreId });
++
++        // Relation between Order & Address
++        modelBuilder.Entity<Order>()
++            .HasOne(o => o.Address)
++            .WithMany()
++            .HasForeignKey(o => o.AddressId);
++
++        // Relation between OrderProductDetails & Order
++        modelBuilder.Entity<OrderProductDetails>()
++            .HasOne<Order>(opd => opd.Order) 
++            .WithMany(o => o.OrderProductDetails)
++            .HasForeignKey(opd => opd.OrderId); 
+ 
+-        // Add your model configurations here
+-        // For example, relationships and key configurations
+-    }
++        // Many-to-many relation between Vinyl & Genre, through VinylGenre
++        modelBuilder.Entity<Vinyl>()
++            .HasMany(v => v.VinylGenres)
++            .WithOne(vg => vg.Vinyl)
++            .HasForeignKey(vg => vg.VinylId);
++
++        modelBuilder.Entity<Genre>()
++            .HasMany(g => g.VinylGenres)
++            .WithOne(vg => vg.Genre)
++            .HasForeignKey(vg => vg.GenreId);
++
++        #region DataSeeding
++        
++        // Seeding Addresses
++        var addresses = new List<Address>
++        {
++            new Address { AddressId = 1, Street = "Birkedommervej", StreetNumber = 29, City = "Copenhagen", Postal = 2400, Country = "Denmark", CardNumber = "4111 1111 1111 1111"},
++            new Address { AddressId = 2, Street = "Dronningsgade", StreetNumber = 8, City = "Fredericia", Postal = 7000, Country = "Denmark", CardNumber = "4111 1111 1111 1112"},
++        };
++        modelBuilder.Entity<Address>().HasData(addresses);
++
++        // Seeding Genres
++        var genres = new List<Genre>
++        {
++            new Genre { GenreId = 1, GenreName = "Alternative" },
++            new Genre { GenreId = 2, GenreName = "HipHop"},
++            new Genre { GenreId = 3, GenreName = "Pop"},
++            new Genre { GenreId = 4, GenreName = "Christmas"}
++        };
++        modelBuilder.Entity<Genre>().HasData(genres);
++
++        // Seeding Vinyls
++        var vinyls = new List<Vinyl>
++        {
++            new Vinyl { VinylId = 1, Title = "Dansktop", Artist = "Ukendt Kunstner", Price = 127, GenreId = 2, ImagePath = "https://moby-disc.dk/media/catalog/product/cache/e7dc67195437dd6c7bf40d88e25a85ce/i/m/image001_9__2.jpg" },
++            new Vinyl { VinylId = 2, Title = "Ye", Artist = "Kanye West", Price = 187, GenreId = 2, ImagePath = "https://moby-disc.dk/media/catalog/product/cache/e7dc67195437dd6c7bf40d88e25a85ce/k/a/kanye-west-2018-ye-compact-disc.jpg" },
++            new Vinyl { VinylId = 3, Title = "OK Computer", Artist = "Radiohead", Price = 227, GenreId = 1,  ImagePath = "https://moby-disc.dk/media/catalog/product/cache/e7dc67195437dd6c7bf40d88e25a85ce/b/f/bfea3555ad38fe476532c5b54f218c09_1.jpg" },
++            new Vinyl { VinylId = 4, Title = "Blonde", Artist = "Frank Ocean", Price = 777, GenreId = 3, ImagePath = "https://best-fit.transforms.svdcdn.com/production/albums/frank-ocean-blond-compressed-0933daea-f052-40e5-85a4-35e07dac73df.jpg?w=469&h=469&q=100&auto=format&fit=crop&dm=1643652677&s=6ef41cb2628eb28d736e27b42635b66e" },
++            new Vinyl { VinylId = 5, Title = "Winter Wonderland", Artist = "Dean Martin", Price = 127, GenreId = 4, ImagePath = "https://moby-disc.dk/media/catalog/product/cache/e7dc67195437dd6c7bf40d88e25a85ce/m/o/moby-disc-13-09-2023_10.54.44.png"}
++        };
++        modelBuilder.Entity<Vinyl>().HasData(vinyls);
++
++        // Seeding Orders
++        var orders = new List<Order>
++        {
++            new Order { OrderId = 1, Email = "john@example.com", BuyDate = DateTime.UtcNow, AddressId = 1 },
++            new Order { OrderId = 2, Email = "adrian@example.com", BuyDate = DateTime.UtcNow, AddressId = 2 },
++        };
++        modelBuilder.Entity<Order>().HasData(orders);
+ 
+-    // Consider adding methods here that allow dynamic addition of DbSets or configurations
++        // Seeding OrderProductDetails
++        var orderDetails = new List<OrderProductDetails>
++        {
++            new OrderProductDetails { OrderProductDetailsId = 1, OrderId = 1, VinylId = 1, Price = 127 },
++            new OrderProductDetails { OrderProductDetailsId = 2, OrderId = 2, VinylId = 2, Price = 187 },
++        };
++        modelBuilder.Entity<OrderProductDetails>().HasData(orderDetails);
++
++        // Seeding VinylGenres (relation between Vinyl & Genre)
++        var vinylGenres = new List<VinylGenre>
++        {
++            new VinylGenre { VinylId = 1, GenreId = 1 },
++            new VinylGenre { VinylId = 2, GenreId = 2},
++            new VinylGenre { VinylId = 3, GenreId = 2},
++            new VinylGenre { VinylId = 4, GenreId = 3},
++            new VinylGenre { VinylId = 5, GenreId = 4}
++        };
++        modelBuilder.Entity<VinylGenre>().HasData(vinylGenres);
++        
++        #endregion
++    }
++    public EfDbContext(DbContextOptions<EfDbContext> options)
++        : base(options)
++    {
++    }
+ }
+ 
+ // ======================================================================
+Index: BLL/Mapping/MappingProfile.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using AutoMapper;\nusing BLL.DTOs;\nusing DAL.Entities;\n\nnamespace BLL.Mapping;\n\npublic class MappingProfile : Profile\n{\n    public MappingProfile()\n    {\n        // Define mappings here\n        CreateMap<Template, TemplateDto>();\n        CreateMap<TemplateDto, Template>();\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/Mapping/MappingProfile.cs b/BLL/Mapping/MappingProfile.cs
+--- a/BLL/Mapping/MappingProfile.cs	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ b/BLL/Mapping/MappingProfile.cs	(date 1700134210279)
+@@ -9,7 +9,7 @@
+     public MappingProfile()
+     {
+         // Define mappings here
+-        CreateMap<Template, TemplateDto>();
+-        CreateMap<TemplateDto, Template>();
++        //CreateMap<Template, TemplateDto>();
++        //CreateMap<TemplateDto, Template>();
+     }
+ }
+\ No newline at end of file
+Index: DAL/Entities/OrderProductDetails.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/Entities/OrderProductDetails.cs b/DAL/Entities/OrderProductDetails.cs
+new file mode 100644
+--- /dev/null	(date 1700128768468)
++++ b/DAL/Entities/OrderProductDetails.cs	(date 1700128768468)
+@@ -0,0 +1,23 @@
++using System.ComponentModel.DataAnnotations;
++
++namespace DataLayer.Models;
++
++public class OrderProductDetails
++{
++    public int OrderProductDetailsId { get; set; }
++    
++    [Required]
++    public int VinylId { get; set; }
++
++    [Required(ErrorMessage = "Price is required.")]
++    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
++    public decimal Price { get; set; }
++    
++    public int Quantity { get; set; }
++    
++    // Navigation properties
++    [Required]
++    public int OrderId { get; set; }
++    public Order Order { get; set; }
++    public Vinyl Vinyl { get; set; }
++}
+\ No newline at end of file
+Index: DAL/Entities/ShoppingCartItem.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/Entities/ShoppingCartItem.cs b/DAL/Entities/ShoppingCartItem.cs
+new file mode 100644
+--- /dev/null	(date 1700128768464)
++++ b/DAL/Entities/ShoppingCartItem.cs	(date 1700128768464)
+@@ -0,0 +1,15 @@
++using System.ComponentModel.DataAnnotations;
++
++namespace DataLayer.Models;
++
++public class ShoppingCartItem
++{
++    [Required]
++    public int VinylId { get; set; }
++    
++    [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
++    public int Quantity { get; set; }
++    
++    public string Title { get; set; }
++    public decimal Price { get; set; }
++}
+\ No newline at end of file
+Index: DAL/Entities/GenreUpdateModel.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/Entities/GenreUpdateModel.cs b/DAL/Entities/GenreUpdateModel.cs
+new file mode 100644
+--- /dev/null	(date 1700128768459)
++++ b/DAL/Entities/GenreUpdateModel.cs	(date 1700128768459)
+@@ -0,0 +1,11 @@
++using System.ComponentModel.DataAnnotations;
++
++namespace DataLayer.Models;
++
++public class GenreUpdateModel
++{
++    public int GenreId { get; set; }
++    
++    [Required(ErrorMessage = "Genre name is required.")]
++    public string GenreName { get; set; }
++}
+\ No newline at end of file
+Index: DAL/Entities/PaginatedResult.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/Entities/PaginatedResult.cs b/DAL/Entities/PaginatedResult.cs
+new file mode 100644
+--- /dev/null	(date 1700128768454)
++++ b/DAL/Entities/PaginatedResult.cs	(date 1700128768454)
+@@ -0,0 +1,8 @@
++namespace DataLayer.Models;
++
++public class PaginatedResult<T>
++{
++    public IEnumerable<T> Items { get; set; }
++    public int CurrentPage { get; set; }
++    public int TotalPages { get; set; }
++}
+\ No newline at end of file
+Index: DAL/Entities/VinylGenre.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/Entities/VinylGenre.cs b/DAL/Entities/VinylGenre.cs
+new file mode 100644
+--- /dev/null	(date 1700128768448)
++++ b/DAL/Entities/VinylGenre.cs	(date 1700128768448)
+@@ -0,0 +1,11 @@
++namespace DataLayer.Models;
++
++public class VinylGenre
++{
++    public int VinylId { get; set; }  // Primary-Key
++    public int GenreId { get; set; }  // Primary-Key
++    
++    // Navigation properties
++    public Vinyl Vinyl { get; set; }
++    public Genre Genre { get; set; }
++}
+\ No newline at end of file
+Index: DAL/Entities/Address.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/Entities/Address.cs b/DAL/Entities/Address.cs
+new file mode 100644
+--- /dev/null	(date 1700128768443)
++++ b/DAL/Entities/Address.cs	(date 1700128768443)
+@@ -0,0 +1,26 @@
++using System.ComponentModel.DataAnnotations;
++
++namespace DataLayer.Models;
++
++public class Address
++{
++    public int AddressId { get; set; }
++    
++    [Required(ErrorMessage = "Postal code is required.")]
++    public int? Postal { get; set; }
++    
++    [Required(ErrorMessage = "Street number is required.")]
++    public int? StreetNumber { get; set; }
++    
++    [Required(ErrorMessage = "City is required.")]
++    public string City { get; set; }
++    
++    [Required(ErrorMessage = "Country is required.")]
++    public string Country { get; set; }
++    
++    [Required(ErrorMessage = "Street is required.")]
++    public string Street { get; set; }
++    
++    [Required(ErrorMessage = "Card number is required.")]
++    public string CardNumber { get; set; }
++}
+\ No newline at end of file
+Index: DAL/Entities/Vinyl.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/Entities/Vinyl.cs b/DAL/Entities/Vinyl.cs
+new file mode 100644
+--- /dev/null	(date 1700128768438)
++++ b/DAL/Entities/Vinyl.cs	(date 1700128768438)
+@@ -0,0 +1,29 @@
++using System.Collections.Generic;
++using System.ComponentModel.DataAnnotations;
++
++namespace DataLayer.Models;
++
++public class Vinyl
++{
++    public int VinylId { get; set; }
++    
++    [Required(ErrorMessage = "Title is required")]
++    public string Title { get; set; } 
++    
++    [Required(ErrorMessage = "Artist is required")]
++    public string? Artist { get; set; }
++    
++    [Required(ErrorMessage = "Price is required")]
++    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
++    public decimal Price { get; set; }
++    
++    [Required(ErrorMessage = "Image path is required")]
++    public string ImagePath { get; set; }
++    
++    [Required(ErrorMessage = "Genre is required")]
++    public int? GenreId { get; set; }
++
++
++    // Navigation properties
++    public ICollection<VinylGenre>? VinylGenres { get; set; }
++}
+\ No newline at end of file
+Index: DAL/Entities/Order.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/Entities/Order.cs b/DAL/Entities/Order.cs
+new file mode 100644
+--- /dev/null	(date 1700128768434)
++++ b/DAL/Entities/Order.cs	(date 1700128768434)
+@@ -0,0 +1,20 @@
++using System.ComponentModel.DataAnnotations;
++using DataLayer.Models;
++
++public class Order
++{
++    public int OrderId { get; set; }
++    
++    [Required(ErrorMessage = "Email is required.")]
++    [EmailAddress(ErrorMessage = "Invalid email address.")]
++    public string Email { get; set; }
++    
++    public DateTime BuyDate { get; set; }
++    
++    [Required]
++    public int AddressId { get; set; }
++
++    // Navigation properties
++    public ICollection<OrderProductDetails> OrderProductDetails { get; set; }
++    public Address Address { get; set; }
++}
+\ No newline at end of file
+Index: DAL/Entities/Genre.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/DAL/Entities/Genre.cs b/DAL/Entities/Genre.cs
+new file mode 100644
+--- /dev/null	(date 1700128768428)
++++ b/DAL/Entities/Genre.cs	(date 1700128768428)
+@@ -0,0 +1,14 @@
++using System.ComponentModel.DataAnnotations;
++
++namespace DataLayer.Models;
++
++public class Genre
++{
++    public int GenreId { get; set; }
++    
++    [Required(ErrorMessage = "Genre name is required.")]
++    public string GenreName { get; set; }
++    
++    // Navigation property
++    public ICollection<VinylGenre> VinylGenres { get; set; }
++}
+\ No newline at end of file
+Index: BLL/DTOs/OrderProductDetailsDto.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/DTOs/OrderProductDetailsDto.cs b/BLL/DTOs/OrderProductDetailsDto.cs
+new file mode 100644
+--- /dev/null	(date 1700134289483)
++++ b/BLL/DTOs/OrderProductDetailsDto.cs	(date 1700134289483)
+@@ -0,0 +1,9 @@
++namespace BLL.DTOs;
++
++public class OrderProductDetailsDto
++{
++    public int OrderProductDetailsId { get; set; }
++    public int VinylId { get; set; }
++    public int OrderId { get; set; }
++    public int Quantity { get; set; }
++}
+Index: BLL/DTOs/ShoppingCartItemDto.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/DTOs/ShoppingCartItemDto.cs b/BLL/DTOs/ShoppingCartItemDto.cs
+new file mode 100644
+--- /dev/null	(date 1700134289476)
++++ b/BLL/DTOs/ShoppingCartItemDto.cs	(date 1700134289476)
+@@ -0,0 +1,9 @@
++namespace BLL.DTOs;
++
++public class ShoppingCartItemDto
++{
++    public int VinylId { get; set; }
++    public int Quantity { get; set; }
++    public string Title { get; set; }
++    public decimal Price { get; set; }
++}
+\ No newline at end of file
+Index: BLL/DTOs/GenreUpdateModelDto.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/DTOs/GenreUpdateModelDto.cs b/BLL/DTOs/GenreUpdateModelDto.cs
+new file mode 100644
+--- /dev/null	(date 1700134289496)
++++ b/BLL/DTOs/GenreUpdateModelDto.cs	(date 1700134289496)
+@@ -0,0 +1,7 @@
++namespace BLL.DTOs;
++
++public class GenreUpdateModelDto
++{
++    public int GenreId { get; set; }
++    public string GenreName { get; set; }
++}
+\ No newline at end of file
+Index: BLL/DTOs/VinylGenreDto.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/DTOs/VinylGenreDto.cs b/BLL/DTOs/VinylGenreDto.cs
+new file mode 100644
+--- /dev/null	(date 1700134289487)
++++ b/BLL/DTOs/VinylGenreDto.cs	(date 1700134289487)
+@@ -0,0 +1,8 @@
++namespace BLL.DTOs;
++
++public class VinylGenreDto
++{
++    public int VinylId { get; set; }
++    public int GenreId { get; set; }
++    public GenreDto Genre { get; set; } 
++}
+\ No newline at end of file
+Index: WebAPI/Program.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using AutoMapper;\nusing BLL.Repositories.Implementations;\nusing BLL.Repositories.Interfaces;\nusing BLL.Services.Implementations;\nusing BLL.Services.Interfaces;\nusing DAL;\nusing DAL.Entities;\nusing BLL.DTOs;\nusing BLL.Mapping;\nusing Microsoft.EntityFrameworkCore;\n\nvar builder = WebApplication.CreateBuilder(args);\n\n// Register AutoMapper\nbuilder.Services.AddAutoMapper(typeof(MappingProfile));\n\n// Add services to the container.\nbuilder.Services.AddDbContext<EfDbContext>(options =>\n    options.UseNpgsql(builder.Configuration.GetConnectionString(\"DefaultConnection\")));\n\n\nbuilder.Services.AddScoped<ITemplateRepository<Template>, TemplateRepository<Template>>();\nbuilder.Services.AddScoped<ITemplateService<TemplateDto>, TemplateService<Template, TemplateDto>>();\n\nbuilder.Services.AddControllers();\n// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle\nbuilder.Services.AddEndpointsApiExplorer();\nbuilder.Services.AddSwaggerGen();\n\nvar app = builder.Build();\n\n// Configure the HTTP request pipeline.\nif (app.Environment.IsDevelopment())\n{\n    app.UseSwagger();\n    app.UseSwaggerUI();\n}\n\napp.UseHttpsRedirection();\n\napp.UseAuthorization();\n\napp.MapControllers();\n\napp.Run();
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/WebAPI/Program.cs b/WebAPI/Program.cs
+--- a/WebAPI/Program.cs	(revision cb80e9b8c84fbe49d8356784480b0a4df5fa3922)
++++ b/WebAPI/Program.cs	(date 1700134432484)
+@@ -1,11 +1,5 @@
+ using AutoMapper;
+-using BLL.Repositories.Implementations;
+-using BLL.Repositories.Interfaces;
+-using BLL.Services.Implementations;
+-using BLL.Services.Interfaces;
+ using DAL;
+-using DAL.Entities;
+-using BLL.DTOs;
+ using BLL.Mapping;
+ using Microsoft.EntityFrameworkCore;
+ 
+@@ -19,8 +13,8 @@
+     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+ 
+ 
+-builder.Services.AddScoped<ITemplateRepository<Template>, TemplateRepository<Template>>();
+-builder.Services.AddScoped<ITemplateService<TemplateDto>, TemplateService<Template, TemplateDto>>();
++//builder.Services.AddScoped<ITemplateRepository<Template>, TemplateRepository<Template>>();
++//builder.Services.AddScoped<ITemplateService<TemplateDto>, TemplateService<Template, TemplateDto>>();
+ 
+ builder.Services.AddControllers();
+ // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+Index: BLL/DTOs/AddressDto.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/DTOs/AddressDto.cs b/BLL/DTOs/AddressDto.cs
+new file mode 100644
+--- /dev/null	(date 1700134435509)
++++ b/BLL/DTOs/AddressDto.cs	(date 1700134435509)
+@@ -0,0 +1,12 @@
++namespace BLL.DTOs;
++
++public class AddressDto
++{
++    public int AddressId { get; set; }
++    public int? Postal { get; set; }
++    public int? StreetNumber { get; set; }
++    public string City { get; set; }
++    public string Country { get; set; }
++    public string Street { get; set; }
++    public string CardNumber { get; set; }
++}
+\ No newline at end of file
+Index: BLL/DTOs/VinylDto.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/DTOs/VinylDto.cs b/BLL/DTOs/VinylDto.cs
+new file mode 100644
+--- /dev/null	(date 1700134289479)
++++ b/BLL/DTOs/VinylDto.cs	(date 1700134289479)
+@@ -0,0 +1,11 @@
++namespace BLL.DTOs;
++
++public class VinylDto
++{
++    public int VinylId { get; set; }
++    public string Title { get; set; }
++    public string? Artist { get; set; }
++    public decimal Price { get; set; }
++    public string ImagePath { get; set; }
++    public List<GenreDto> Genres { get; set; }
++}
+\ No newline at end of file
+Index: BLL/DTOs/OrderDto.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/DTOs/OrderDto.cs b/BLL/DTOs/OrderDto.cs
+new file mode 100644
+--- /dev/null	(date 1700134289492)
++++ b/BLL/DTOs/OrderDto.cs	(date 1700134289492)
+@@ -0,0 +1,9 @@
++namespace BLL.DTOs;
++
++public class OrderDto
++{
++    public int OrderId { get; set; }
++    public string Email { get; set; }
++    public DateTime BuyDate { get; set; }
++    public AddressDto Address { get; set; }
++}
+\ No newline at end of file
+Index: BLL/DTOs/GenreDto.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/DTOs/GenreDto.cs b/BLL/DTOs/GenreDto.cs
+new file mode 100644
+--- /dev/null	(date 1700134435513)
++++ b/BLL/DTOs/GenreDto.cs	(date 1700134435513)
+@@ -0,0 +1,7 @@
++namespace BLL.DTOs;
++
++public class GenreDto
++{
++    public int GenreId { get; set; }
++    public string GenreName { get; set; }
++}
+\ No newline at end of file
+Index: BLL/Repositories/VinylService.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/Repositories/VinylService.cs b/BLL/Repositories/VinylService.cs
+new file mode 100644
+--- /dev/null	(date 1700134177114)
++++ b/BLL/Repositories/VinylService.cs	(date 1700134177114)
+@@ -0,0 +1,197 @@
++using BLL.Interfaces;
++using DAL;
++using DataLayer.Models;
++using Microsoft.EntityFrameworkCore;
++
++namespace BLL.Repositories;
++
++public class VinylService : IVinylService
++{
++    private readonly EfDbContext _context;
++
++    public VinylService(EfDbContext context)
++    {
++        _context = context;
++    }
++    
++    public void CreateVinyl(Vinyl vinyl)
++    {
++        _context.Vinyls.Add(vinyl);
++        _context.SaveChanges();
++    }
++
++    public void DeleteVinylById(int vinylId)
++    {
++        var vinyl = _context.Vinyls.Find(vinylId);
++        if (vinyl != null)
++        {
++            _context.Vinyls.Remove(vinyl);
++            _context.SaveChanges();
++        }
++    }
++
++    public Vinyl GetVinylById(int id)
++    {
++        return _context.Vinyls
++            .Include(v => v.VinylGenres)
++            .FirstOrDefault(v => v.VinylId == id);
++    }
++
++    public void UpdateVinylBy(int vinylId, Vinyl newVinyl)
++    {
++        var vinyl = _context.Vinyls.Find(vinylId);
++        if (vinyl != null)
++        {
++            vinyl.Title = newVinyl.Title;
++            vinyl.Artist = newVinyl.Artist;
++            vinyl.Price = newVinyl.Price;
++            vinyl.ImagePath = newVinyl.ImagePath;
++            vinyl.GenreId = newVinyl.GenreId;
++            _context.SaveChanges();
++        }
++    }
++
++    public IQueryable<Vinyl> GetAllVinyls()
++    {
++        return _context.Vinyls
++            .Include(v => v.VinylGenres)
++            .ThenInclude(vg => vg.Genre);
++    }
++
++    public IQueryable<Vinyl> GetAllVinylsPaged(int currentPage, int pageSize)
++    {
++        return GetAllVinyls()
++            .OrderBy(v => v.VinylId)
++            .Skip((currentPage - 1) * pageSize)
++            .Take(pageSize);
++    }
++    
++    
++    //
++    
++    public IQueryable<Vinyl> GetAllFullVinyls()
++    {
++        return _context.Vinyls
++            .Include(v => v.VinylGenres)
++            .ThenInclude(vg => vg.Genre);
++    }
++    
++    public IQueryable<Vinyl> GetAllFullVinylsPaged(int currentPage, int pageSize)
++    {
++        return GetAllFullVinyls()
++            .OrderBy(v => v.VinylId)
++            .Skip((currentPage - 1) * pageSize)
++            .Take(pageSize);
++    }
++    
++    public IQueryable<Vinyl> FilterVinylsPaged(
++            int currentPage,
++            int pageSize,
++            string? searchTerm,
++            int? genreId,
++            string? filterTitle,
++            string? price)
++    {
++        var query = GetAllFullVinyls();
++        if (!string.IsNullOrWhiteSpace(searchTerm))
++        {
++            query = query.Where(v => v.Title.Contains(searchTerm));
++        }
++        
++        if (genreId.HasValue && genreId.Value > 0)
++        {
++            query = query.Where(v => v.VinylGenres != null && v.VinylGenres.Any(vg => vg.GenreId == genreId.Value));
++        }
++        
++        if (!string.IsNullOrWhiteSpace(filterTitle))
++        {
++            query = filterTitle == "+" 
++                ? query.OrderBy(v => v.Title) 
++                : query.OrderByDescending(v => v.Title);
++        }
++
++        if (!string.IsNullOrWhiteSpace(price))
++        {
++            query = price == "+" 
++                ? query.OrderBy(v => v.Price) 
++                : query.OrderByDescending(v => v.Price);
++        }
++        return query
++            .Skip((currentPage - 1) * pageSize)
++            .Take(pageSize);
++    }
++    
++    public enum SortDirection
++    {
++        Ascending,
++        Descending
++    }
++    
++    public IQueryable<Vinyl> FilterVinyls(
++        string searchTerm,
++        int? genreId,
++        string titleSort,
++        string priceSort)
++    {
++        SortDirection? titleSortDirection = ParseSortDirection(titleSort);
++        SortDirection? priceSortDirection = ParseSortDirection(priceSort);
++        
++        IQueryable<Vinyl> query = _context.Vinyls
++            .Include(v => v.VinylGenres)
++            .ThenInclude(vg => vg.Genre);
++
++        if (!string.IsNullOrWhiteSpace(searchTerm))
++        {
++            query = query.Where(v => EF.Functions.Like(v.Title, $"%{searchTerm}%"));
++        }
++
++        if (genreId.HasValue && genreId.Value > 0)
++        {
++            query = query.Where(v => v.VinylGenres.Any(vg => vg.GenreId == genreId.Value));
++        }
++
++        if (titleSortDirection.HasValue)
++        {
++            query = titleSortDirection == SortDirection.Ascending
++                ? query.OrderBy(v => v.Title)
++                : query.OrderByDescending(v => v.Title);
++        }
++
++        if (priceSortDirection.HasValue)
++        {
++            query = priceSortDirection == SortDirection.Ascending
++                ? query.OrderBy(v => v.Price)
++                : query.OrderByDescending(v => v.Price);
++        }
++
++        return query;
++    }
++    
++    private SortDirection? ParseSortDirection(string sortParameter)
++    {
++        return sortParameter switch
++        {
++            "Ascending" => SortDirection.Ascending,
++            "Descending" => SortDirection.Descending,
++            _ => null
++        };
++    }
++    
++    public PaginatedResult<Vinyl> GetPaginatedVinyls(int currentPage, int pageSize, string searchTerm, int? genreId, string titleSort, string priceSort)
++    {
++        var query = FilterVinyls(searchTerm, genreId, titleSort, priceSort);
++        var totalRecords = query.Count();
++
++        var items = query
++            .Skip((currentPage - 1) * pageSize)
++            .Take(pageSize)
++            .ToList();
++
++        return new PaginatedResult<Vinyl>
++        {
++            Items = items,
++            CurrentPage = currentPage,
++            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
++        };
++    }
++}
+\ No newline at end of file
+Index: BLL/Repositories/OrderService.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/Repositories/OrderService.cs b/BLL/Repositories/OrderService.cs
+new file mode 100644
+--- /dev/null	(date 1700134435504)
++++ b/BLL/Repositories/OrderService.cs	(date 1700134435504)
+@@ -0,0 +1,285 @@
++using BLL.DTOs;
++using BLL.Interfaces;
++using DAL;
++using DataLayer.Models;
++using Microsoft.EntityFrameworkCore;
++
++namespace BLL.Repositories;
++
++public class OrderService : IOrderService
++{
++    private readonly EfDbContext _context;
++
++    public OrderService(EfDbContext melodyMineService)
++    {
++        _context = melodyMineService;
++    }
++    
++    public void CreateOrder(Order? order)
++    {
++        _context.Orders.Add(order); 
++        _context.SaveChanges();
++    }
++
++    public void CreateOrderProductDetails(List<OrderProductDetails> orderProductsDetails)
++    {
++        foreach (OrderProductDetails opd in orderProductsDetails)
++        {
++            _context.OrderProductDetails.Add(opd);
++        }
++        _context.SaveChanges();
++    }
++    
++    public int CreateAddress(Address address)
++    {
++        _context.Addresses.Add(address);
++        _context.SaveChanges();
++        
++        return address.AddressId;
++    }
++
++    public void AddProductDetails(IEnumerable<OrderProductDetails> orderProductDetails)
++    {
++        _context.OrderProductDetails.AddRange(orderProductDetails);
++        _context.SaveChanges();
++    }
++    
++    public void DeleteOrder(Order? order)
++    {
++        var existingOrder = _context.Orders.Find(order.OrderId);
++        if (existingOrder != null)
++        {
++            _context.Orders.Remove(existingOrder);
++            _context.SaveChanges();
++        }
++    }
++    
++    public Order? GetSingleOrderBy(int id)
++    {
++        Order? tempOrder = _context.Orders
++            .FirstOrDefault(o => o.OrderId == id);
++
++        return tempOrder;
++    }
++    
++    public Order GetSingleFullOrderBy(int id)
++    {
++        return _context.Orders
++            .Include(o => o.OrderProductDetails)
++            .Include(o => o.Address)
++            .FirstOrDefault(o => o.OrderId == id);
++    }
++    
++    public Order GetSingleOrderBy(string email)
++    {
++        Order tempOrder = _context.Orders
++            .FirstOrDefault(o => o.Email == email);
++
++        return tempOrder;
++    }
++    
++    public Order GetSingleFullOrderBy(string email)
++    {
++        return _context.Orders
++            .Include(o => o.OrderProductDetails)
++            .Include(o => o.Address)
++            .FirstOrDefault(o => o.Email == email);
++    }
++
++    public void UpdateOrderById(int orderId, Order newOrder)
++    {
++        Order existingOrder = _context.Orders
++            .Include(o => o.OrderProductDetails)
++            .Include(o => o.Address)
++            .FirstOrDefault(o => o.OrderId == orderId);
++
++        if (existingOrder == null)
++        {
++            throw new Exception($"Order with ID {orderId} not found.");
++        }
++
++        existingOrder.Email = newOrder.Email;
++        existingOrder.BuyDate = newOrder.BuyDate;
++        existingOrder.AddressId = newOrder.AddressId;
++        
++        if (newOrder.OrderProductDetails != null)
++        {
++            foreach (var newOpd in newOrder.OrderProductDetails)
++            {
++                var existingOpd = existingOrder.OrderProductDetails
++                    .FirstOrDefault(opd => opd.OrderProductDetailsId == newOpd.OrderProductDetailsId);
++
++                if (existingOpd != null)
++                {
++                    _context.Entry(existingOpd).CurrentValues.SetValues(newOpd);
++                }
++                else
++                {
++                    existingOrder.OrderProductDetails.Add(newOpd);
++                }
++            }
++        }
++        
++        if (newOrder.Address != null && existingOrder.AddressId == newOrder.Address.AddressId)
++        {
++            _context.Entry(existingOrder.Address).CurrentValues.SetValues(newOrder.Address);
++        }
++
++        _context.SaveChanges();
++    }
++    
++    public void UpdateOrderByEmail(string orderEmail, Order newOrder)
++    {
++        Order tempOrder = _context.Orders
++            .FirstOrDefault(o => o.Email == orderEmail);
++
++        if (tempOrder == null)
++        {
++            return;
++        }
++
++        tempOrder.Email = newOrder.Email;
++        tempOrder.BuyDate = newOrder.BuyDate;
++        _context.SaveChanges();
++    }
++
++    
++    public IQueryable<Order?> GetAllOrders()
++    {
++        IQueryable<Order?> tempOrders = _context.Orders;
++
++        return tempOrders;
++    }
++    
++    public IQueryable<Order> GetAllFullOrders()
++    {
++        IQueryable<Order> tempOrders = _context.Orders
++            .Include(o => o.OrderProductDetails);
++
++        return tempOrders;
++    }
++    
++    public void UpdateAddress(int addressId, Address newAddress)
++    {
++        var address = _context.Addresses.Find(addressId);
++        if (address != null)
++        {
++            _context.Entry(address).CurrentValues.SetValues(newAddress);
++            _context.SaveChanges();
++        }
++    }
++    
++    public void UpdateOrderProductDetails(List<OrderProductDetails> newOrderProductDetails)
++    {
++        foreach (var opd in newOrderProductDetails)
++        {
++            var existingOpd = _context.OrderProductDetails.Find(opd.OrderProductDetailsId);
++            if (existingOpd != null)
++            {
++                _context.Entry(existingOpd).CurrentValues.SetValues(opd);
++            }
++        }
++        _context.SaveChanges();
++    }
++    
++    public bool OrderExists(int id)
++    {
++        return _context.Orders.Any(e => e.OrderId == id);
++    }
++    
++    // DTO Services
++    public void UpdateOrderDto(OrderDto orderDto)
++    {
++        var existingOrder = _context.Orders
++            .Include(o => o.Address)
++            .FirstOrDefault(o => o.OrderId == orderDto.OrderId);
++        
++        if (existingOrder == null) 
++            throw new Exception($"Order with ID {orderDto.OrderId} not found.");
++    
++        existingOrder.Email = orderDto.Email;
++        existingOrder.BuyDate = orderDto.BuyDate;
++        
++        if (existingOrder.Address != null && orderDto.Address != null)
++        {
++            existingOrder.Address.Postal = orderDto.Address.Postal;
++            existingOrder.Address.StreetNumber = orderDto.Address.StreetNumber;
++            existingOrder.Address.City = orderDto.Address.City;
++            existingOrder.Address.Country = orderDto.Address.Country;
++            existingOrder.Address.Street = orderDto.Address.Street;
++            existingOrder.Address.CardNumber = orderDto.Address.CardNumber;
++        }
++
++        _context.SaveChanges();
++    }
++    
++    public OrderDto GetOrderDtoById(int id)
++    {
++        var orderWithDetails = _context.Orders
++            .Where(o => o.OrderId == id)
++            .Select(o => new 
++            {
++                Order = o,
++                Address = o.Address,
++                OrderProductDetails = o.OrderProductDetails
++            })
++            .FirstOrDefault();
++
++        if (orderWithDetails == null) return null;
++
++        var orderDto = new OrderDto
++        {
++            OrderId = orderWithDetails.Order.OrderId,
++            Email = orderWithDetails.Order.Email,
++            BuyDate = orderWithDetails.Order.BuyDate,
++            Address = new AddressDto
++            {
++                AddressId = orderWithDetails.Address.AddressId,
++                Postal = orderWithDetails.Address.Postal,
++                StreetNumber = orderWithDetails.Address.StreetNumber,
++                City = orderWithDetails.Address.City,
++                Country = orderWithDetails.Address.Country,
++                Street = orderWithDetails.Address.Street,
++                CardNumber = orderWithDetails.Address.CardNumber
++            },
++        };
++
++        return orderDto;
++    }
++    
++    public List<OrderProductDetailsDto> GetOrderProductDetailsDtoByOrderId(int orderId)
++    {
++        var orderProductDetailsList = _context.OrderProductDetails
++            .Where(opd => opd.OrderId == orderId)
++            .Include(opd => opd.Vinyl)
++            .Select(opd => new OrderProductDetailsDto
++            {
++                OrderProductDetailsId = opd.OrderProductDetailsId,
++                Quantity = opd.Quantity,
++                VinylId = opd.VinylId
++            })
++            .ToList();
++
++        return orderProductDetailsList;
++    }
++
++    public void UpdateOrderProductDetailsDto(List<OrderProductDetailsDto> orderProductDetailsDtos)
++    {
++        foreach (var opdDto in orderProductDetailsDtos)
++        {
++            var existingOpd = _context.OrderProductDetails
++                .Include(opd => opd.Vinyl)
++                .SingleOrDefault(opd => opd.OrderProductDetailsId == opdDto.OrderProductDetailsId);
++
++            if (existingOpd != null)
++            {
++                existingOpd.Quantity = opdDto.Quantity;
++                existingOpd.VinylId = opdDto.VinylId;
++
++                _context.Entry(existingOpd).State = EntityState.Modified;
++            }
++        }
++        
++        _context.SaveChanges();
++    }
++}
+\ No newline at end of file
+Index: BLL/Repositories/GenreService.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/Repositories/GenreService.cs b/BLL/Repositories/GenreService.cs
+new file mode 100644
+--- /dev/null	(date 1700134124584)
++++ b/BLL/Repositories/GenreService.cs	(date 1700134124584)
+@@ -0,0 +1,86 @@
++using BLL.Interfaces;
++using DAL;
++using DataLayer.Models;
++using Microsoft.EntityFrameworkCore;
++
++namespace BLL.Repositories;
++
++public class GenreService : IGenreService
++{
++    private readonly EfDbContext _context;
++
++    public GenreService(EfDbContext melodyMineService)
++    {
++        _context = melodyMineService;
++    }
++    
++    public IQueryable<Genre> GetAllGenres()
++    {
++        IQueryable<Genre> tempGenres = _context.Genres.Distinct();
++        
++        return tempGenres;
++    }
++
++    
++    public IQueryable<Genre> GetGenresById(int genreId)
++    {
++        IQueryable<Genre> tempGenres = _context.Genres.Where(c => c.GenreId == genreId);
++
++        return tempGenres;
++    }
++    
++    public IQueryable<VinylGenre> GetAllVinylGenres()
++    {
++        IQueryable<VinylGenre> tempGenres = _context.VinylGenres;
++            
++        return tempGenres;
++    }
++    
++    public void CreateVinylGenre(int VinylId, int GenreId)
++    {
++        _context.VinylGenres.Add(new VinylGenre { VinylId = VinylId, GenreId = GenreId });
++        _context.SaveChanges();
++    }
++    
++    public void CreateGenre(Genre genre)
++    {
++        _context.Genres.Add(genre);
++        _context.SaveChanges();
++    }
++    
++    public void UpdateGenre(Genre genre)
++    {
++        var existingGenre = _context.Genres.Find(genre.GenreId);
++        if (existingGenre != null)
++        {
++            existingGenre.GenreName = genre.GenreName;
++            _context.SaveChanges();
++        }
++    }
++
++    public bool DeleteGenre(int genreId)
++    {
++        var genre = _context.Genres.Find(genreId);
++        if (genre != null)
++        {
++            _context.Genres.Remove(genre);
++            _context.SaveChanges();
++            return true;
++        }
++        return false;
++    }
++    
++    public async Task UpdateVinylGenreLink(int vinylId, int genreId)
++    {
++        var vinyl = _context.Vinyls.Include(v => v.VinylGenres).Where(v => v.VinylId == vinylId).FirstOrDefault();
++        if (vinyl.VinylGenres.Any())
++        {
++            vinyl.VinylGenres.Clear();
++        }
++        
++        var newVinylGenre = new VinylGenre { VinylId = vinylId, GenreId = genreId };
++        vinyl.VinylGenres.Add(newVinylGenre);
++        
++        await _context.SaveChangesAsync();
++    }
++}
+\ No newline at end of file
+Index: BLL/Interfaces/IVinylService.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BLL/Interfaces/IVinylService.cs b/BLL/Interfaces/IVinylService.cs
+new file mode 100644
+--- /dev/null	(date 1700134210289)
++++ b/BLL/Interfaces/IVinylService.cs	(date 1700134210289)
+@@ -0,0 +1,24 @@
++using DataLayer.Models;
++
++namespace BLL.Interfaces;
++
++public interface IVinylService
++{
++    public void CreateVinyl(Vinyl vinyl);
++    public void DeleteVinylById(int VinylId);
++    public Vinyl GetVinylById(int id);
++    public void UpdateVinylBy(int vinylId, Vinyl newVinyl);
++    public IQueryable<Vinyl> GetAllVinyls();
++    public IQueryable<Vinyl> GetAllVinylsPaged(int currentPage, int pageSize);
++    public IQueryable<Vinyl> GetAllFullVinylsPaged(int currentPage, int pageSize);
++    public IQueryable<Vinyl> FilterVinylsPaged(int currentPage, int pageSize, string? SearchTerm, int? GenreId, string? FilterTitle, string? Price);
++    PaginatedResult<Vinyl> GetPaginatedVinyls(int currentPage, int pageSize, string searchTerm, int? genreId, string titleSort, string priceSort);
++
++    // Both used in GetPaginatedVinyls
++    public IQueryable<Vinyl> GetAllFullVinyls();
++    public IQueryable<Vinyl> FilterVinyls(
++        string searchTerm,
++        int? genreId,
++        string titleSort,
++        string priceSort);
++}
+\ No newline at end of file
+diff --git a/ProjectTemplate.sln b/MelodyMine.sln
+rename from ProjectTemplate.sln
+rename to MelodyMine.sln

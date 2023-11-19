@@ -9,7 +9,7 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         // Define mappings here
-        CreateMap<Template, TemplateDto>();
-        CreateMap<TemplateDto, Template>();
+        //CreateMap<Template, TemplateDto>();
+        //CreateMap<TemplateDto, Template>();
     }
 }
