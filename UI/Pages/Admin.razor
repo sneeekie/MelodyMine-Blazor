@@ -1,0 +1,50 @@
+﻿@page "/admin"
+
+<h3>Admin</h3>
+
+<p>Here you'll find information, on how to Administrate our different entities in MelodyMine.
+    <br />
+    Simply click 'Info' for further more information.
+</p>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-info" data-toggle="modal" data-target="#infoModal">
+    Info
+</button>
+
+<!-- Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="infoModal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p class="px-3">
+                    1. Check and make sure the entity you are about to add does not already exist in the database.
+                    <br />
+                    2. Click 'Administrate Entities'. <br>
+                    3. Choose between 'Genres', 'Vinyls' & 'Orders'. <br>
+                    4. Proceed to fill out the information for the entity. <br>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dropdown -->
+<div class="dropdown mt-2">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
+        Administrate Entities
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <NavLink class="dropdown-item" href="/EditVinyls">Vinyls</NavLink>
+        <NavLink class="dropdown-item" href="/EditOrders">Orders</NavLink>
+        <NavLink class="dropdown-item" href="/EditGenres">Genres</NavLink>
+    </div>
+</div>
+
+@code {
+
+}
