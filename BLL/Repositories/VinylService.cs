@@ -2,6 +2,7 @@ using BLL.Interfaces;
 using DAL;
 using DataLayer.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.DTOs;
 
 namespace BLL.Repositories;
 
@@ -13,11 +14,20 @@ public class VinylService : IVinylService
     {
         _context = context;
     }
-    
-    public void CreateVinyl(Vinyl vinyl)
+
+    public void CreateVinyl(VinylDto vinylDTO)
     {
-        _context.Vinyls.Add(vinyl);
-        _context.SaveChanges();
+        var vinyl = new Vinyl
+        {
+            Artist = vinylDTO.Artist,
+            Title = vinylDTO.Title,
+            Price = vinylDTO.Price,
+            ImagePath = vinylDTO.ImagePath,
+        };
+        {
+            _context.Vinyls.Add(vinyl);
+            _context.SaveChanges();
+        }
     }
 
     public bool DeleteVinylById(int vinylId)
@@ -32,104 +42,168 @@ public class VinylService : IVinylService
         return false;
     }
 
-    public Vinyl GetVinylById(int id)
+    public VinylDto GetVinylById(int id)
     {
-        return _context.Vinyls
+        var vinyl = _context.Vinyls
             .Include(v => v.VinylGenres)
             .FirstOrDefault(v => v.VinylId == id);
+
+        if (vinyl == null)
+        {
+            return null;
+        }
+
+        return new VinylDto
+        {
+            VinylId = vinyl.VinylId,
+            Artist = vinyl.Artist,
+            Title = vinyl.Title,
+            Price = vinyl.Price,
+            ImagePath = vinyl.ImagePath,
+        };
     }
 
-    public void UpdateVinylBy(int vinylId, Vinyl newVinyl)
+    public void UpdateVinylBy(int vinylId, VinylDto newVinylDTO)
     {
         var vinyl = _context.Vinyls.Find(vinylId);
         if (vinyl != null)
         {
-            vinyl.Title = newVinyl.Title;
-            vinyl.Artist = newVinyl.Artist;
-            vinyl.Price = newVinyl.Price;
-            vinyl.ImagePath = newVinyl.ImagePath;
-            vinyl.GenreId = newVinyl.GenreId;
+            vinyl.Title = newVinylDTO.Title;
+            vinyl.Artist = newVinylDTO.Artist;
+            vinyl.Price = newVinylDTO.Price;
+            vinyl.ImagePath = newVinylDTO.ImagePath;
             _context.SaveChanges();
         }
     }
 
-    public IQueryable<Vinyl> GetAllVinyls()
+    public IQueryable<VinylDto> GetAllVinyls()
     {
         return _context.Vinyls
             .Include(v => v.VinylGenres)
-            .ThenInclude(vg => vg.Genre);
+            .ThenInclude(vg => vg.Genre)
+            .Select(v => new VinylDto
+            {
+                VinylId = v.VinylId,
+                Artist = v.Artist,
+                Title = v.Title,
+                Price = v.Price,
+                ImagePath = v.ImagePath,
+            });
     }
 
-    public IQueryable<Vinyl> GetAllVinylsPaged(int currentPage, int pageSize)
+    public IQueryable<VinylDto> GetAllVinylsPaged(int currentPage, int pageSize)
     {
-        return GetAllVinyls()
-            .OrderBy(v => v.VinylId)
-            .Skip((currentPage - 1) * pageSize)
-            .Take(pageSize);
+        var vinyls = _context.Vinyls
+            .Include(v => v.VinylGenres)
+            .ThenInclude(vg => vg.Genre)
+            .ToList();
+
+        return vinyls.Select(v => new VinylDto
+        {
+            VinylId = v.VinylId,
+            Artist = v.Artist,
+            Title = v.Title,
+            Price = v.Price,
+            ImagePath = v.ImagePath,
+        })
+        .AsQueryable()
+        .OrderBy(v => v.VinylId)
+        .Skip((currentPage - 1) * pageSize)
+        .Take(pageSize);
     }
-    
-    
-    //
-    
-    public IQueryable<Vinyl> GetAllFullVinyls()
+
+    public IQueryable<VinylDto> GetAllFullVinyls()
     {
         return _context.Vinyls
             .Include(v => v.VinylGenres)
-            .ThenInclude(vg => vg.Genre);
+            .ThenInclude(vg => vg.Genre)
+            .Select(v => new VinylDto
+            {
+                VinylId = v.VinylId,
+                Artist = v.Artist,
+                Title = v.Title,
+                Price = v.Price,
+                ImagePath = v.ImagePath,
+            });
     }
-    
-    public IQueryable<Vinyl> GetAllFullVinylsPaged(int currentPage, int pageSize)
+
+    public IQueryable<VinylDto> GetAllFullVinylsPaged(int currentPage, int pageSize)
     {
-        return GetAllFullVinyls()
-            .OrderBy(v => v.VinylId)
-            .Skip((currentPage - 1) * pageSize)
-            .Take(pageSize);
+        var vinyls = _context.Vinyls
+            .Include(v => v.VinylGenres)
+            .ThenInclude(vg => vg.Genre)
+            .ToList();
+
+        return vinyls.Select(v => new VinylDto
+        {
+            VinylId = v.VinylId,
+            Artist = v.Artist,
+            Title = v.Title,
+            Price = v.Price,
+            ImagePath = v.ImagePath,
+        })
+        .AsQueryable()
+        .OrderBy(v => v.VinylId)
+        .Skip((currentPage - 1) * pageSize)
+        .Take(pageSize);
     }
-    
-    public IQueryable<Vinyl> FilterVinylsPaged(
-            int currentPage,
-            int pageSize,
-            string? searchTerm,
-            int? genreId,
-            string? filterTitle,
-            string? price)
+
+    public IQueryable<VinylDto> FilterVinylsPaged(
+    int currentPage,
+    int pageSize,
+    string? searchTerm,
+    int? genreId,
+    string? filterTitle,
+    string? price)
     {
-        var query = GetAllFullVinyls();
+        var query = _context.Vinyls
+            .Include(v => v.VinylGenres)
+            .ThenInclude(vg => vg.Genre)
+            .AsQueryable();
+
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             query = query.Where(v => v.Title.Contains(searchTerm));
         }
-        
+
         if (genreId.HasValue && genreId.Value > 0)
         {
             query = query.Where(v => v.VinylGenres != null && v.VinylGenres.Any(vg => vg.GenreId == genreId.Value));
         }
-        
+
         if (!string.IsNullOrWhiteSpace(filterTitle))
         {
-            query = filterTitle == "+" 
-                ? query.OrderBy(v => v.Title) 
+            query = filterTitle == "+"
+                ? query.OrderBy(v => v.Title)
                 : query.OrderByDescending(v => v.Title);
         }
 
         if (!string.IsNullOrWhiteSpace(price))
         {
-            query = price == "+" 
-                ? query.OrderBy(v => v.Price) 
+            query = price == "+"
+                ? query.OrderBy(v => v.Price)
                 : query.OrderByDescending(v => v.Price);
         }
+
         return query
+            .Select(v => new VinylDto
+            {
+                VinylId = v.VinylId,
+                Artist = v.Artist,
+                Title = v.Title,
+                Price = v.Price,
+                ImagePath = v.ImagePath
+            })
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize);
     }
-    
     public enum SortDirection
     {
         Ascending,
         Descending
     }
-    
-    public IQueryable<Vinyl> FilterVinyls(
+
+    public IQueryable<VinylDto> FilterVinyls(
         string searchTerm,
         int? genreId,
         string titleSort,
@@ -137,7 +211,7 @@ public class VinylService : IVinylService
     {
         SortDirection? titleSortDirection = ParseSortDirection(titleSort);
         SortDirection? priceSortDirection = ParseSortDirection(priceSort);
-        
+
         IQueryable<Vinyl> query = _context.Vinyls
             .Include(v => v.VinylGenres)
             .ThenInclude(vg => vg.Genre);
@@ -166,9 +240,16 @@ public class VinylService : IVinylService
                 : query.OrderByDescending(v => v.Price);
         }
 
-        return query;
+        return query.Select(v => new VinylDto
+        {
+            VinylId = v.VinylId,
+            Artist = v.Artist,
+            Title = v.Title,
+            Price = v.Price,
+            ImagePath = v.ImagePath,
+        });
     }
-    
+
     private SortDirection? ParseSortDirection(string sortParameter)
     {
         return sortParameter switch
@@ -178,8 +259,8 @@ public class VinylService : IVinylService
             _ => null
         };
     }
-    
-    public PaginatedResult<Vinyl> GetPaginatedVinyls(int currentPage, int pageSize, string searchTerm, int? genreId, string titleSort, string priceSort)
+
+    public PaginatedResult<VinylDto> GetPaginatedVinyls(int currentPage, int pageSize, string searchTerm, int? genreId, string titleSort, string priceSort)
     {
         var query = FilterVinyls(searchTerm, genreId, titleSort, priceSort);
         var totalRecords = query.Count();
@@ -187,9 +268,17 @@ public class VinylService : IVinylService
         var items = query
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
+            .Select(v => new VinylDto
+            {
+                VinylId = v.VinylId,
+                Artist = v.Artist,
+                Title = v.Title,
+                Price = v.Price,
+                ImagePath = v.ImagePath
+            })
             .ToList();
 
-        return new PaginatedResult<Vinyl>
+        return new PaginatedResult<VinylDto>
         {
             Items = items,
             CurrentPage = currentPage,

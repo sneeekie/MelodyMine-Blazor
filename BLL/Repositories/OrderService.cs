@@ -1,4 +1,4 @@
-using BLL.DTOs;
+using Shared.DTOs;
 using BLL.Interfaces;
 using DAL;
 using DataLayer.Models;
@@ -14,10 +14,10 @@ public class OrderService : IOrderService
     {
         _context = melodyMineService;
     }
-    
+
     public void CreateOrder(Order? order)
     {
-        _context.Orders.Add(order); 
+        _context.Orders.Add(order);
         _context.SaveChanges();
     }
 
@@ -29,12 +29,12 @@ public class OrderService : IOrderService
         }
         _context.SaveChanges();
     }
-    
+
     public int CreateAddress(Address address)
     {
         _context.Addresses.Add(address);
         _context.SaveChanges();
-        
+
         return address.AddressId;
     }
 
@@ -43,7 +43,7 @@ public class OrderService : IOrderService
         _context.OrderProductDetails.AddRange(orderProductDetails);
         _context.SaveChanges();
     }
-    
+
     public void DeleteOrder(Order? order)
     {
         var existingOrder = _context.Orders.Find(order.OrderId);
@@ -53,7 +53,7 @@ public class OrderService : IOrderService
             _context.SaveChanges();
         }
     }
-    
+
     public Order? GetSingleOrderBy(int id)
     {
         Order? tempOrder = _context.Orders
@@ -61,7 +61,7 @@ public class OrderService : IOrderService
 
         return tempOrder;
     }
-    
+
     public Order GetSingleFullOrderBy(int id)
     {
         return _context.Orders
@@ -69,7 +69,7 @@ public class OrderService : IOrderService
             .Include(o => o.Address)
             .FirstOrDefault(o => o.OrderId == id);
     }
-    
+
     public Order GetSingleOrderBy(string email)
     {
         Order tempOrder = _context.Orders
@@ -77,7 +77,7 @@ public class OrderService : IOrderService
 
         return tempOrder;
     }
-    
+
     public Order GetSingleFullOrderBy(string email)
     {
         return _context.Orders
@@ -101,7 +101,7 @@ public class OrderService : IOrderService
         existingOrder.Email = newOrder.Email;
         existingOrder.BuyDate = newOrder.BuyDate;
         existingOrder.AddressId = newOrder.AddressId;
-        
+
         if (newOrder.OrderProductDetails != null)
         {
             foreach (var newOpd in newOrder.OrderProductDetails)
@@ -119,7 +119,7 @@ public class OrderService : IOrderService
                 }
             }
         }
-        
+
         if (newOrder.Address != null && existingOrder.AddressId == newOrder.Address.AddressId)
         {
             _context.Entry(existingOrder.Address).CurrentValues.SetValues(newOrder.Address);
@@ -127,7 +127,7 @@ public class OrderService : IOrderService
 
         _context.SaveChanges();
     }
-    
+
     public void UpdateOrderByEmail(string orderEmail, Order newOrder)
     {
         Order tempOrder = _context.Orders
@@ -143,14 +143,14 @@ public class OrderService : IOrderService
         _context.SaveChanges();
     }
 
-    
+
     public IQueryable<Order?> GetAllOrders()
     {
         IQueryable<Order?> tempOrders = _context.Orders;
 
         return tempOrders;
     }
-    
+
     public IQueryable<Order> GetAllFullOrders()
     {
         IQueryable<Order> tempOrders = _context.Orders
@@ -158,7 +158,7 @@ public class OrderService : IOrderService
 
         return tempOrders;
     }
-    
+
     public void UpdateAddress(int addressId, Address newAddress)
     {
         var address = _context.Addresses.Find(addressId);
@@ -168,7 +168,7 @@ public class OrderService : IOrderService
             _context.SaveChanges();
         }
     }
-    
+
     public void UpdateOrderProductDetails(List<OrderProductDetails> newOrderProductDetails)
     {
         foreach (var opd in newOrderProductDetails)
@@ -181,25 +181,25 @@ public class OrderService : IOrderService
         }
         _context.SaveChanges();
     }
-    
+
     public bool OrderExists(int id)
     {
         return _context.Orders.Any(e => e.OrderId == id);
     }
-    
+
     // DTO Services
     public void UpdateOrderDto(OrderDto orderDto)
     {
         var existingOrder = _context.Orders
             .Include(o => o.Address)
             .FirstOrDefault(o => o.OrderId == orderDto.OrderId);
-        
-        if (existingOrder == null) 
+
+        if (existingOrder == null)
             throw new Exception($"Order with ID {orderDto.OrderId} not found.");
-    
+
         existingOrder.Email = orderDto.Email;
         existingOrder.BuyDate = orderDto.BuyDate;
-        
+
         if (existingOrder.Address != null && orderDto.Address != null)
         {
             existingOrder.Address.Postal = orderDto.Address.Postal;
@@ -212,12 +212,12 @@ public class OrderService : IOrderService
 
         _context.SaveChanges();
     }
-    
+
     public OrderDto GetOrderDtoById(int id)
     {
         var orderWithDetails = _context.Orders
             .Where(o => o.OrderId == id)
-            .Select(o => new 
+            .Select(o => new
             {
                 Order = o,
                 Address = o.Address,
@@ -246,7 +246,7 @@ public class OrderService : IOrderService
 
         return orderDto;
     }
-    
+
     public List<OrderProductDetailsDto> GetOrderProductDetailsDtoByOrderId(int orderId)
     {
         var orderProductDetailsList = _context.OrderProductDetails
@@ -279,7 +279,7 @@ public class OrderService : IOrderService
                 _context.Entry(existingOpd).State = EntityState.Modified;
             }
         }
-        
+
         _context.SaveChanges();
     }
 }
