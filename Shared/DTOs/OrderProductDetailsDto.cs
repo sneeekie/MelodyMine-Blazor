@@ -1,4 +1,4 @@
-namespace BLL.DTOs;
+namespace Shared.DTOs;
 
 public class OrderProductDetailsDto
 {

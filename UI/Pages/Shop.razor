@@ -1,0 +1,86 @@
+@page "/vinyls"
+@using global::Shared.DTOs
+@inject HttpClient HttpClient
+
+<h3>Vinyls</h3>
+
+<p>Use this page for shopping Vinyls!</p>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        @foreach (var vinyl in _vinyls)
+        {
+            <div class="col-lg-3 my-2">
+                <div class="card">
+                    @if (!string.IsNullOrEmpty(vinyl.ImagePath))
+                    {
+                        <img src="@vinyl.ImagePath" class="card-img-top" alt="Cover for @vinyl.Title">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@vinyl.Title</h5>
+                        <p class="card-text">@vinyl.Artist</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="font-weight-bold">kr. @vinyl.Price</div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Inject] private ILogger<Shop> _logger { get; init; } = default!;
+    private List<VinylDto> _vinyls = new List<VinylDto>();
+    private int currentPage = 1;
+    private int totalPages = 1;
+
+    string sortField = null;
+    bool sortAscending = true;
+    string searchTerm;
+    string genreId;
+    string titleSort;
+    string priceSort;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _vinyls = await HttpClient.GetFromJsonAsync<List<VinylDto>>("api/vinyls");
+            await GetVinyls(currentPage);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+        }
+    }
+
+    private async Task GetVinyls(int page, string sortField = null, bool sortAscending = true)
+    {
+        try
+        {
+            var response = await
+            HttpClient.GetAsync($"http://localhost:5225/api/vinyls?page={page}&searchTerm={searchTerm}&sortField={sortField}&sortAscending={sortAscending}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                _vinyls = await response.Content.ReadFromJsonAsync<List<VinylDto>>();
+
+                currentPage = page;
+                totalPages = int.Parse(response.Headers.GetValues("totalPages").FirstOrDefault());
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+}

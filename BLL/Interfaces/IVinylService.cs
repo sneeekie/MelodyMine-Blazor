@@ -1,22 +1,23 @@
+using Shared.DTOs;
 using DataLayer.Models;
 
 namespace BLL.Interfaces;
 
 public interface IVinylService
 {
-    public void CreateVinyl(Vinyl vinyl);
-    public bool DeleteVinylById(int VinylId);
-    public Vinyl GetVinylById(int id);
-    public void UpdateVinylBy(int vinylId, Vinyl newVinyl);
-    public IQueryable<Vinyl> GetAllVinyls();
-    public IQueryable<Vinyl> GetAllVinylsPaged(int currentPage, int pageSize);
-    public IQueryable<Vinyl> GetAllFullVinylsPaged(int currentPage, int pageSize);
-    public IQueryable<Vinyl> FilterVinylsPaged(int currentPage, int pageSize, string? SearchTerm, int? GenreId, string? FilterTitle, string? Price);
-    PaginatedResult<Vinyl> GetPaginatedVinyls(int currentPage, int pageSize, string searchTerm, int? genreId, string titleSort, string priceSort);
+    void CreateVinyl(VinylDto vinylDto);
+    bool DeleteVinylById(int VinylId);
+    VinylDto GetVinylById(int id);
+    void UpdateVinylBy(int vinylId, VinylDto newVinylDTO);
+    IQueryable<VinylDto> GetAllVinyls();
+    IQueryable<VinylDto> GetAllVinylsPaged(int currentPage, int pageSize);
+    IQueryable<VinylDto> GetAllFullVinylsPaged(int currentPage, int pageSize);
+    IQueryable<VinylDto> FilterVinylsPaged(int currentPage, int pageSize, string? SearchTerm, int? GenreId, string? FilterTitle, string? Price);
+    PaginatedResult<VinylDto> GetPaginatedVinyls(int currentPage, int pageSize, string searchTerm, int? genreId, string titleSort, string priceSort);
 
     // Both used in GetPaginatedVinyls
-    public IQueryable<Vinyl> GetAllFullVinyls();
-    public IQueryable<Vinyl> FilterVinyls(
+    IQueryable<VinylDto> GetAllFullVinyls();
+    IQueryable<VinylDto> FilterVinyls(
         string searchTerm,
         int? genreId,
         string titleSort,

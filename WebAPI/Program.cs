@@ -19,18 +19,25 @@ builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IVinylService, VinylService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-
-//builder.Services.AddScoped<ITemplateRepository<Template>, TemplateRepository<Template>>();
-//builder.Services.AddScoped<ITemplateService<TemplateDto>, TemplateService<Template, TemplateDto>>();
+// Add CORS services
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:5027")
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    //options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -41,6 +48,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(); // Use CORS middleware
 
 app.UseAuthorization();
 

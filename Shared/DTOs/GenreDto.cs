@@ -1,6 +1,6 @@
-namespace BLL.DTOs;
+namespace Shared.DTOs;
 
-public class GenreUpdateModelDto
+public class GenreDto
 {
     public int GenreId { get; set; }
     public string GenreName { get; set; }

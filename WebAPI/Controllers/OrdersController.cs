@@ -18,7 +18,7 @@ public class OrdersController : ControllerBase
 
     // GET: api/Orders
     [HttpGet]
-    public ActionResult<IEnumerable<Order>> GetOrders()
+    public ActionResult<List<Order>> GetOrders()
     {
         return Ok(_orderService.GetAllOrders().ToList());
     }
@@ -34,7 +34,7 @@ public class OrdersController : ControllerBase
         }
         return Ok(order);
     }
-    
+
     // POST: api/Orders
     [HttpPost]
     public ActionResult<Order> CreateOrder(Order order)

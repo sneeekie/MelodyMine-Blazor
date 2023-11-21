@@ -1,4 +1,4 @@
-using BLL.DTOs;
+using Shared.DTOs;
 using DataLayer.Models;
 
 namespace BLL.Interfaces;

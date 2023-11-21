@@ -17,7 +17,7 @@ public class GenresController : ControllerBase
 
     // GET: api/Genres
     [HttpGet]
-    public ActionResult<IEnumerable<Genre>> GetGenres()
+    public ActionResult<List<Genre>> GetGenres()
     {
         return Ok(_genreService.GetAllGenres().ToList());
     }

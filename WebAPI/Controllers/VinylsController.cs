@@ -2,68 +2,120 @@ using BLL.Interfaces;
 using DataLayer.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
+using Shared.DTOs;
 
-namespace WebAPI.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class VinylsController : ControllerBase
+namespace WebAPI.Controllers
 {
-    private readonly IVinylService _vinylService;
+    [Route("api/[controller]")]
+    [ApiController]
+    public class VinylsController : ControllerBase
+    {
+        private readonly IVinylService _vinylService;
 
-    public VinylsController(IVinylService vinylService)
-    {
-        _vinylService = vinylService;
-    }
-
-    // GET: api/Vinyls
-    [HttpGet]
-    public ActionResult<IEnumerable<Vinyl>> GetVinyls()
-    {
-        return Ok(_vinylService.GetAllVinyls().ToList());
-    }
-    
-    // GET: api/Vinyls/{id}
-    [HttpGet("{id}")]
-    public ActionResult<Vinyl> GetVinyl(int id)
-    {
-        var vinyl = _vinylService.GetVinylById(id);
-        if (vinyl == null)
+        public VinylsController(IVinylService vinylService)
         {
-            return NotFound();
+            _vinylService = vinylService;
         }
-        return Ok(vinyl);
-    }
 
-    // POST: api/Vinyls
-    [HttpPost]
-    public ActionResult<Vinyl> CreateVinyl(Vinyl vinyl)
-    {
-        _vinylService.CreateVinyl(vinyl);
-        return CreatedAtAction(nameof(GetVinyl), new { id = vinyl.VinylId }, vinyl);
-    }
-
-    // PUT: api/Vinyls/{id}
-    [HttpPut("{id}")]
-    public IActionResult UpdateVinyl(int id, Vinyl vinyl)
-    {
-        if (id != vinyl.VinylId)
+        // GET: api/Vinyls
+        [HttpGet]
+        public ActionResult<List<VinylDto>> GetVinyls()
         {
-            return BadRequest();
-        }
-        _vinylService.UpdateVinylBy(id, vinyl);
-        return NoContent();
-    }
+            var vinyls = _vinylService.GetAllVinyls().ToList();
+            var vinylDTOs = vinyls.Select(vinyl => new VinylDto
+            {
+                VinylId = vinyl.VinylId,
+                Artist = vinyl.Artist,
+                Title = vinyl.Title,
+                Price = vinyl.Price,
+                ImagePath = vinyl.ImagePath
+            }).ToList();
 
-    // DELETE: api/Vinyls/{id}
-    [HttpDelete("{id}")]
-    public IActionResult DeleteVinyl(int id)
-    {
-        var success = _vinylService.DeleteVinylById(id);
-        if (!success)
-        {
-            return NotFound();
+            return Ok(vinylDTOs);
         }
-        return NoContent();
+
+        // GET: api/Vinyls/{id}
+        [HttpGet("{id}")]
+        public ActionResult<VinylDto> GetVinyl(int id)
+        {
+            var vinyl = _vinylService.GetVinylById(id);
+            if (vinyl == null)
+            {
+                return NotFound();
+            }
+
+            var vinylDTO = new VinylDto
+            {
+                VinylId = vinyl.VinylId,
+                Artist = vinyl.Artist,
+                Title = vinyl.Title,
+                Price = vinyl.Price,
+                ImagePath = vinyl.ImagePath
+            };
+
+            return Ok(vinylDTO);
+        }
+
+        // PUT: api/Vinyls/{id}
+        [HttpPut("{id}")]
+        public IActionResult UpdateVinyl(int id, VinylDto vinylDTO)
+        {
+            if (id != vinylDTO.VinylId)
+            {
+                return BadRequest();
+            }
+
+            var vinyl = new Vinyl
+            {
+                VinylId = vinylDTO.VinylId,
+                Artist = vinylDTO.Artist,
+                Title = vinylDTO.Title,
+                Price = vinylDTO.Price,
+                ImagePath = vinylDTO.ImagePath
+            };
+
+            _vinylService.UpdateVinylBy(id, vinylDTO);
+            return NoContent();
+        }
+
+        // DELETE: api/Vinyls/{id}
+        [HttpDelete("{id}")]
+        public IActionResult DeleteVinyl(int id)
+        {
+            var success = _vinylService.DeleteVinylById(id);
+            if (!success)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/Vinyls
+        [HttpPost]
+        public ActionResult<VinylDto> CreateVinyl(VinylDto vinylDTO)
+        {
+            var vinyl = new Vinyl
+            {
+                Artist = vinylDTO.Artist,
+                Title = vinylDTO.Title,
+                Price = vinylDTO.Price,
+                ImagePath = vinylDTO.ImagePath
+            };
+
+            _vinylService.CreateVinyl(vinylDTO);
+
+            var createdVinylDTO = new VinylDto
+            {
+                VinylId = vinyl.VinylId,
+                Artist = vinyl.Artist,
+                Title = vinyl.Title,
+                Price = vinyl.Price,
+                ImagePath = vinyl.ImagePath
+            };
+
+            return CreatedAtAction(nameof(GetVinyl), new { id = createdVinylDTO.VinylId }, createdVinylDTO);
+        }
     }
 }
