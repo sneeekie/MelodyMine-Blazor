@@ -47,15 +47,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            _vinyls = await HttpClient.GetFromJsonAsync<List<VinylDto>>("api/vinyls");
-            await GetVinyls(currentPage);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, ex.Message);
-        }
+        _vinyls = await HttpClient.GetFromJsonAsync<List<VinylDto>>("api/vinyls");
+        await GetVinyls(currentPage);
     }
 
     private async Task GetVinyls(int page, string sortField = null, bool sortAscending = true)
