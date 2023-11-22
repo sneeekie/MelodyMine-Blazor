@@ -1,10 +1,12 @@
-using BLL.Interfaces;
-using DAL;
+using Shared.DTOs;
 using DataLayer.Models;
+using DAL;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using BLL.Interfaces;
 
 namespace BLL.Repositories;
-
 public class GenreService : IGenreService
 {
     private readonly EfDbContext _context;
@@ -13,74 +15,63 @@ public class GenreService : IGenreService
     {
         _context = melodyMineService;
     }
-    
-    public IQueryable<Genre> GetAllGenres()
+
+    public async Task<List<GenreDto>> GetAllGenres()
     {
-        IQueryable<Genre> tempGenres = _context.Genres.Distinct();
-        
-        return tempGenres;
+        return await _context.Genres
+            .Select(g => new GenreDto { GenreId = g.GenreId, GenreName = g.GenreName })
+            .ToListAsync();
     }
 
-    
-    public IQueryable<Genre> GetGenresById(int genreId)
+    public async Task<GenreDto> GetGenresById(int genreId)
     {
-        IQueryable<Genre> tempGenres = _context.Genres.Where(c => c.GenreId == genreId);
+        var genre = await _context.Genres.FindAsync(genreId);
+        if (genre == null) return null;
 
-        return tempGenres;
+        return new GenreDto { GenreId = genre.GenreId, GenreName = genre.GenreName };
     }
-    
+
+    public async Task CreateGenre(GenreDto genreDto)
+    {
+        var genre = new Genre { GenreName = genreDto.GenreName };
+        _context.Genres.Add(genre);
+        await _context.SaveChangesAsync();
+
+        genreDto.GenreId = genre.GenreId;
+    }
+
+    public async Task UpdateGenre(GenreDto genreDto)
+    {
+        var genre = await _context.Genres.FindAsync(genreDto.GenreId);
+        if (genre == null) return;
+
+        genre.GenreName = genreDto.GenreName;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> DeleteGenre(int id)
+    {
+        var genre = await _context.Genres.FindAsync(id);
+        if (genre == null) return false;
+
+        _context.Genres.Remove(genre);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
     public IQueryable<VinylGenre> GetAllVinylGenres()
     {
-        IQueryable<VinylGenre> tempGenres = _context.VinylGenres;
-            
-        return tempGenres;
-    }
-    
-    public void CreateVinylGenre(int VinylId, int GenreId)
-    {
-        _context.VinylGenres.Add(new VinylGenre { VinylId = VinylId, GenreId = GenreId });
-        _context.SaveChanges();
-    }
-    
-    public void CreateGenre(Genre genre)
-    {
-        _context.Genres.Add(genre);
-        _context.SaveChanges();
-    }
-    
-    public void UpdateGenre(Genre genre)
-    {
-        var existingGenre = _context.Genres.Find(genre.GenreId);
-        if (existingGenre != null)
-        {
-            existingGenre.GenreName = genre.GenreName;
-            _context.SaveChanges();
-        }
+        throw new NotImplementedException();
     }
 
-    public bool DeleteGenre(int genreId)
+    public void CreateVinylGenre(int VinylId, int GenreId)
     {
-        var genre = _context.Genres.Find(genreId);
-        if (genre != null)
-        {
-            _context.Genres.Remove(genre);
-            _context.SaveChanges();
-            return true;
-        }
-        return false;
+        throw new NotImplementedException();
     }
-    
-    public async Task UpdateVinylGenreLink(int vinylId, int genreId)
+
+    public Task UpdateVinylGenreLink(int vinylId, int genreId)
     {
-        var vinyl = _context.Vinyls.Include(v => v.VinylGenres).FirstOrDefault(v => v.VinylId == vinylId);
-        if (vinyl.VinylGenres.Any())
-        {
-            vinyl.VinylGenres.Clear();
-        }
-        
-        var newVinylGenre = new VinylGenre { VinylId = vinylId, GenreId = genreId };
-        vinyl.VinylGenres.Add(newVinylGenre);
-        
-        await _context.SaveChangesAsync();
+        throw new NotImplementedException();
     }
 }
