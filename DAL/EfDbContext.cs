@@ -21,30 +21,25 @@ public class EfDbContext : DbContext
     {
         if (optionsBuilder.IsConfigured)
             return;
-        
+
         optionsBuilder
             .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
             .EnableSensitiveDataLogging(true)
             .UseNpgsql("Host=localhost;Database=MelodyMineDb;Username=Adrian;Password=123456;");
     }
-    
+
     // DbSet properties
     public DbSet<Vinyl> Vinyls { get; set; }
     public DbSet<Genre> Genres { get; set; }
     public DbSet<Address> Addresses { get; set; }
     public DbSet<Order?> Orders { get; set; }
     public DbSet<OrderProductDetails> OrderProductDetails { get; set; }
-    public DbSet<VinylGenre> VinylGenres { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Order>()
-            .Property(e => e.BuyDate)
-            .HasDefaultValueSql("NOW()");
-        
-        // Configure keys for VinylGenre
-        modelBuilder.Entity<VinylGenre>()
-            .HasKey(vg => new { vg.VinylId, vg.GenreId });
+    .Property(e => e.BuyDate)
+    .HasDefaultValueSql("NOW()");
 
         // Relation between Order & Address
         modelBuilder.Entity<Order>()
@@ -54,23 +49,16 @@ public class EfDbContext : DbContext
 
         // Relation between OrderProductDetails & Order
         modelBuilder.Entity<OrderProductDetails>()
-            .HasOne<Order>(opd => opd.Order) 
+            .HasOne<Order>(opd => opd.Order)
             .WithMany(o => o.OrderProductDetails)
-            .HasForeignKey(opd => opd.OrderId); 
+            .HasForeignKey(opd => opd.OrderId);
 
-        // Many-to-many relation between Vinyl & Genre, through VinylGenre
+        // One-to-many relation between Vinyl & Genre
         modelBuilder.Entity<Vinyl>()
-            .HasMany(v => v.VinylGenres)
-            .WithOne(vg => vg.Vinyl)
-            .HasForeignKey(vg => vg.VinylId);
+            .HasOne(v => v.Genre)
+            .WithMany(g => g.Vinyls)
+            .HasForeignKey(v => v.GenreId);
 
-        modelBuilder.Entity<Genre>()
-            .HasMany(g => g.VinylGenres)
-            .WithOne(vg => vg.Genre)
-            .HasForeignKey(vg => vg.GenreId);
-
-        #region DataSeeding
-        
         // Seeding Addresses
         var addresses = new List<Address>
         {
@@ -115,19 +103,6 @@ public class EfDbContext : DbContext
             new OrderProductDetails { OrderProductDetailsId = 2, OrderId = 2, VinylId = 2, Price = 187 },
         };
         modelBuilder.Entity<OrderProductDetails>().HasData(orderDetails);
-
-        // Seeding VinylGenres (relation between Vinyl & Genre)
-        var vinylGenres = new List<VinylGenre>
-        {
-            new VinylGenre { VinylId = 1, GenreId = 1 },
-            new VinylGenre { VinylId = 2, GenreId = 2},
-            new VinylGenre { VinylId = 3, GenreId = 2},
-            new VinylGenre { VinylId = 4, GenreId = 3},
-            new VinylGenre { VinylId = 5, GenreId = 4}
-        };
-        modelBuilder.Entity<VinylGenre>().HasData(vinylGenres);
-        
-        #endregion
     }
     public EfDbContext(DbContextOptions<EfDbContext> options)
         : base(options)

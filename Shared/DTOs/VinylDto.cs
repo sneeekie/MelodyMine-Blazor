@@ -13,5 +13,7 @@ public class VinylDto
     public decimal Price { get; set; }
     [Required]
     public string ImagePath { get; set; }
-    public List<GenreDto> Genres { get; set; }
+
+    public string GenreName { get; set; }
+    public int GenreId { get; set; }
 }

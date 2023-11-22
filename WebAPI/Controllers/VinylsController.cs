@@ -101,21 +101,24 @@ namespace WebAPI.Controllers
                 Artist = vinylDTO.Artist,
                 Title = vinylDTO.Title,
                 Price = vinylDTO.Price,
-                ImagePath = vinylDTO.ImagePath
+                ImagePath = vinylDTO.ImagePath,
+                GenreId = vinylDTO.GenreId,
+                Genre = new Genre { GenreName = vinylDTO.GenreName }
             };
 
             _vinylService.CreateVinyl(vinylDTO);
 
-            var createdVinylDTO = new VinylDto
+            var newVinyl = new VinylDto
             {
                 VinylId = vinyl.VinylId,
                 Artist = vinyl.Artist,
                 Title = vinyl.Title,
                 Price = vinyl.Price,
-                ImagePath = vinyl.ImagePath
+                ImagePath = vinyl.ImagePath,
+                GenreId = vinyl.GenreId,
+                GenreName = vinyl.Genre.GenreName
             };
-
-            return CreatedAtAction(nameof(GetVinyl), new { id = createdVinylDTO.VinylId }, createdVinylDTO);
+            return CreatedAtAction(nameof(GetVinyl), new { id = newVinyl.VinylId }, newVinyl);
         }
     }
 }
