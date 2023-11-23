@@ -12,25 +12,26 @@
 
     <div class="form-group">
         <label for="title">Title:</label>
-        <InputText id="title" @bind-Value="newVinyl.Title" class="form-control" />
+        <InputText id="title" @bind-Value="newVinyl.Title" class="form-control" placeholder="Enter vinyl name" />
         <ValidationMessage For="@(() => newVinyl.Title)" />
     </div>
 
     <div class="form-group">
         <label for="artist">Artist:</label>
-        <InputText id="artist" @bind-Value="newVinyl.Artist" class="form-control" />
+        <InputText id="artist" @bind-Value="newVinyl.Artist" class="form-control" placeholder="Enter artist" />
         <ValidationMessage For="@(() => newVinyl.Artist)" />
     </div>
 
     <div class="form-group">
         <label for="price">Price:</label>
-        <InputNumber id="price" @bind-Value="newVinyl.Price" class="form-control" />
+        <InputNumber id="price" @bind-Value="newVinyl.Price" class="form-control" placeholder="Enter price" />
         <ValidationMessage For="@(() => newVinyl.Price)" />
     </div>
 
     <div class="form-group">
         <label for="imagePath">Image Path:</label>
-        <InputText id="imagePath" @bind-Value="newVinyl.ImagePath" class="form-control" />
+        <InputText id="imagePath" @bind-Value="newVinyl.ImagePath" class="form-control"
+            placeholder="Enter image path" />
         <ValidationMessage For="@(() => newVinyl.ImagePath)" />
     </div>
 
@@ -113,7 +114,7 @@ else
         if (response.IsSuccessStatusCode)
         {
             _vinyls = await Http.GetFromJsonAsync<VinylDto[]>("api/vinyls");
-            newVinyl = new VinylDto(); 
+            newVinyl = new VinylDto();
         }
         else
         {
