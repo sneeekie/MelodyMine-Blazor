@@ -113,6 +113,7 @@ else
         if (response.IsSuccessStatusCode)
         {
             _vinyls = await Http.GetFromJsonAsync<VinylDto[]>("api/vinyls");
+            newVinyl = new VinylDto();
         }
         else
         {
