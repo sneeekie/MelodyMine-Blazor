@@ -1,7 +1,80 @@
-﻿@page "/EditVinyl"
+﻿@page "/EditVinyl/{VinylId}"
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@using global::Shared.DTOs;
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.Text.Json;
 
-<h3>EditVinyl</h3>
+<h3>Edit Vinyl</h3>
+<h3>Edit Vinyl</h3>
+
+@if (vinyl != null)
+{
+    <EditForm Model="vinyl" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText id="title" @bind-Value="vinyl.Title" />
+    <InputText id="artist" @bind-Value="vinyl.Artist" />
+    <InputNumber id="price" @bind-Value="vinyl.Price" />
+    <InputText id="imagePath" @bind-Value="vinyl.ImagePath" />
+    <InputSelect id="genreId" @bind-Value="vinyl.GenreId">
+        @foreach (var genre in genres)
+            {
+                <option value="@genre.GenreId">@genre.GenreName</option>
+            }
+        </InputSelect>
+
+        <button type="submit">Submit</button>
+    </EditForm>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+<button @onclick="Back">Back</button>
 
 @code {
+    [Parameter]
+    public string VinylId { get; set; }
 
+    VinylDto vinyl;
+    List<GenreDto> genres;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int vinylId = int.Parse(VinylId);
+
+        var response = await Http.GetAsync("api/Genres");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            genres = JsonSerializer.Deserialize<List<GenreDto>>(responseBody, options);
+        }
+
+        vinyl = await Http.GetFromJsonAsync<VinylDto>("api/vinyls/" + VinylId);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        Console.WriteLine(JsonSerializer.Serialize(vinyl));
+
+        var response = await Http.PutAsJsonAsync("api/vinyls/" + vinyl.VinylId, vinyl);
+        if (response.IsSuccessStatusCode)
+        {
+            vinyl = await Http.GetFromJsonAsync<VinylDto>("api/vinyls/" + VinylId);
+        }
+        else
+        {
+            var errorResponse = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(errorResponse);
+        }
+    }
+
+    void Back()
+    {
+        NavManager.NavigateTo("/VinylOverview");
+    }
 }

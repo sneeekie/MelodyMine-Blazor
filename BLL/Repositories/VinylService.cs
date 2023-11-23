@@ -76,6 +76,7 @@ public class VinylService : IVinylService
             vinyl.Artist = newVinylDTO.Artist;
             vinyl.Price = newVinylDTO.Price;
             vinyl.ImagePath = newVinylDTO.ImagePath;
+            vinyl.GenreId = newVinylDTO.GenreId;
             _context.SaveChanges();
         }
     }
