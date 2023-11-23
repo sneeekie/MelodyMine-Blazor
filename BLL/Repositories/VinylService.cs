@@ -15,7 +15,7 @@ public class VinylService : IVinylService
         _context = context;
     }
 
-    public void CreateVinyl(VinylDto vinylDTO)
+    public Vinyl CreateVinyl(VinylDto vinylDTO)
     {
         var vinyl = new Vinyl
         {
@@ -28,6 +28,8 @@ public class VinylService : IVinylService
 
         _context.Vinyls.Add(vinyl);
         _context.SaveChanges();
+
+        return vinyl;
     }
 
     public bool DeleteVinylById(int vinylId)

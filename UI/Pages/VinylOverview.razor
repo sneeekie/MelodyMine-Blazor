@@ -105,7 +105,6 @@ else
         _vinyls = await Http.GetFromJsonAsync<VinylDto[]>("api/vinyls");
     }
 
-    // TODO: Fix the bug where the new vinyl is not added to the list
     private async Task HandleSubmit()
     {
         Console.WriteLine(JsonSerializer.Serialize(newVinyl));

@@ -14,6 +14,6 @@ public class VinylDto
     [Required]
     public string ImagePath { get; set; }
 
-    public string GenreName { get; set; }
+    public string? GenreName { get; set; }
     public int GenreId { get; set; }
 }

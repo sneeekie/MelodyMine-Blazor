@@ -29,7 +29,9 @@ namespace WebAPI.Controllers
                 Artist = vinyl.Artist,
                 Title = vinyl.Title,
                 Price = vinyl.Price,
-                ImagePath = vinyl.ImagePath
+                ImagePath = vinyl.ImagePath,
+                GenreId = vinyl.GenreId,
+                GenreName = vinyl.GenreName
             }).ToList();
 
             return Ok(vinylDTOs);
@@ -96,17 +98,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public ActionResult<VinylDto> CreateVinyl(VinylDto vinylDTO)
         {
-            var vinyl = new Vinyl
-            {
-                Artist = vinylDTO.Artist,
-                Title = vinylDTO.Title,
-                Price = vinylDTO.Price,
-                ImagePath = vinylDTO.ImagePath,
-                GenreId = vinylDTO.GenreId,
-                Genre = new Genre { GenreName = vinylDTO.GenreName }
-            };
-
-            _vinylService.CreateVinyl(vinylDTO);
+            var vinyl = _vinylService.CreateVinyl(vinylDTO);
 
             var newVinyl = new VinylDto
             {
@@ -115,8 +107,7 @@ namespace WebAPI.Controllers
                 Title = vinyl.Title,
                 Price = vinyl.Price,
                 ImagePath = vinyl.ImagePath,
-                GenreId = vinyl.GenreId,
-                GenreName = vinyl.Genre.GenreName
+                GenreId = vinyl.GenreId
             };
             return CreatedAtAction(nameof(GetVinyl), new { id = newVinyl.VinylId }, newVinyl);
         }
