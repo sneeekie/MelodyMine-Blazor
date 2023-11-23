@@ -1,68 +1,77 @@
 using BLL.Interfaces;
-using DataLayer.Models;
+using Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebAPI.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class GenresController : ControllerBase
+namespace WebAPI.Controllers
 {
-    private readonly IGenreService _genreService;
-
-    public GenresController(IGenreService genreService)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class GenresController : ControllerBase
     {
-        _genreService = genreService;
-    }
+        private readonly IGenreService _genreService;
 
-    // GET: api/Genres
-    [HttpGet]
-    public ActionResult<List<Genre>> GetGenres()
-    {
-        return Ok(_genreService.GetAllGenres().ToList());
-    }
-
-    // GET: api/Genres/5
-    [HttpGet("{id}")]
-    public ActionResult<Genre> GetGenre(int id)
-    {
-        var genre = _genreService.GetGenresById(id).FirstOrDefault();
-        if (genre == null)
+        public GenresController(IGenreService genreService)
         {
-            return NotFound();
+            _genreService = genreService;
         }
-        return Ok(genre);
-    }
 
-    // POST: api/Genres
-    [HttpPost]
-    public ActionResult<Genre> PostGenre(Genre genre)
-    {
-        _genreService.CreateGenre(genre);
-        return CreatedAtAction(nameof(GetGenre), new { id = genre.GenreId }, genre);
-    }
-
-    // PUT: api/Genres/5
-    [HttpPut("{id}")]
-    public IActionResult PutGenre(int id, Genre genre)
-    {
-        if (id != genre.GenreId)
+        // GET: api/Genres
+        [HttpGet]
+        public async Task<ActionResult<List<GenreDto>>> GetGenres()
         {
-            return BadRequest();
+            var genres = await _genreService.GetAllGenres();
+            if (genres == null)
+            {
+                return NotFound();
+            }
+            return Ok(genres);
         }
-        _genreService.UpdateGenre(genre);
-        return NoContent();
-    }
 
-    // DELETE: api/Genres/5
-    [HttpDelete("{id}")]
-    public ActionResult<Genre> DeleteGenre(int id)
-    {
-        var success = _genreService.DeleteGenre(id);
-        if (!success)
+        // GET: api/Genres/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GenreDto>> GetGenre(int id)
         {
-            return NotFound();
+            var genre = await _genreService.GetGenresById(id);
+            if (genre == null)
+            {
+                return NotFound();
+            }
+            return Ok(genre);
         }
-        return NoContent();
+
+        // POST: api/Genres
+        [HttpPost]
+        public async Task<ActionResult<GenreDto>> PostGenre(GenreDto genre)
+        {
+            await _genreService.CreateGenre(genre);
+            return CreatedAtAction(nameof(GetGenre), new { id = genre.GenreId }, genre);
+        }
+
+        // PUT: api/Genres/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutGenre(int id, GenreDto genre)
+        {
+            if (id != genre.GenreId)
+            {
+                return BadRequest();
+            }
+
+            await _genreService.UpdateGenre(genre);
+
+            return NoContent();
+        }
+
+        // DELETE: api/Genres/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteGenre(int id)
+        {
+            var success = await _genreService.DeleteGenre(id);
+            if (!success)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
     }
 }

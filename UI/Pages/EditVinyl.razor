@@ -1,0 +1,105 @@
+﻿@page "/EditVinyl/{VinylId}"
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@using global::Shared.DTOs;
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.Text.Json;
+
+<h3>Edit Vinyl</h3>
+
+@if (vinyl != null)
+{
+    <EditForm Model="vinyl" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group fw-bold">
+            <label for="title">Album</label>
+            <InputText id="title" @bind-Value="vinyl.Title" class="form-control" placeholder="Enter vinyl name" />
+            <ValidationMessage For="@(() => vinyl.Title)" class="text-danger" />
+        </div>
+
+        <div class="form-group fw-bold">
+            <label for="artist">Artist</label>
+            <InputText id="artist" @bind-Value="vinyl.Artist" class="form-control" placeholder="Enter artist name" />
+            <ValidationMessage For="@(() => vinyl.Artist)" class="text-danger" />
+        </div>
+
+        <div class="form-group fw-bold">
+            <label for="price">Price</label>
+            <InputNumber id="price" @bind-Value="vinyl.Price" class="form-control" placeholder="Enter price" />
+            <ValidationMessage For="@(() => vinyl.Price)" class="text-danger" />
+        </div>
+
+        <div class="form-group fw-bold">
+            <label for="imagePath">Image</label>
+            <InputText id="imagePath" @bind-Value="vinyl.ImagePath" class="form-control" placeholder="Enter image path" />
+            <ValidationMessage For="@(() => vinyl.ImagePath)" class="text-danger" />
+        </div>
+
+        <div class="form-group fw-bold">
+            <label for="genreId">Genre</label>
+            <InputSelect id="genreId" @bind-Value="vinyl.GenreId" class="form-control">
+                <option value="">-- Select a Genre --</option>
+                @foreach (var genre in genres)
+                {
+                    <option value="@genre.GenreId">@genre.GenreName</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => vinyl.GenreId)" class="text-danger" />
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary mt-1">Update Vinyl</button>
+            <button class="btn btn-secondary mt-1" @onclick="Back">Back</button>
+        </div>
+    </EditForm>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public string VinylId { get; set; }
+
+    VinylDto vinyl;
+    List<GenreDto> genres;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int vinylId = int.Parse(VinylId);
+
+        var response = await Http.GetAsync("api/Genres");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            genres = JsonSerializer.Deserialize<List<GenreDto>>(responseBody, options);
+        }
+
+        vinyl = await Http.GetFromJsonAsync<VinylDto>("api/vinyls/" + VinylId);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        Console.WriteLine(JsonSerializer.Serialize(vinyl));
+
+        var response = await Http.PutAsJsonAsync("api/vinyls/" + vinyl.VinylId, vinyl);
+        if (response.IsSuccessStatusCode)
+        {
+            vinyl = await Http.GetFromJsonAsync<VinylDto>("api/vinyls/" + VinylId);
+            NavManager.NavigateTo("/VinylOverview");
+        }
+        else
+        {
+            var errorResponse = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(errorResponse);
+        }
+    }
+
+    void Back()
+    {
+        NavManager.NavigateTo("/VinylOverview");
+    }
+}

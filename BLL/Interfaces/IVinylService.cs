@@ -5,7 +5,7 @@ namespace BLL.Interfaces;
 
 public interface IVinylService
 {
-    void CreateVinyl(VinylDto vinylDto);
+    Vinyl CreateVinyl(VinylDto vinylDto);
     bool DeleteVinylById(int VinylId);
     VinylDto GetVinylById(int id);
     void UpdateVinylBy(int vinylId, VinylDto newVinylDTO);

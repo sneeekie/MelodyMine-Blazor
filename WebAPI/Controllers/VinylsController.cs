@@ -29,7 +29,9 @@ namespace WebAPI.Controllers
                 Artist = vinyl.Artist,
                 Title = vinyl.Title,
                 Price = vinyl.Price,
-                ImagePath = vinyl.ImagePath
+                ImagePath = vinyl.ImagePath,
+                GenreId = vinyl.GenreId,
+                GenreName = vinyl.GenreName
             }).ToList();
 
             return Ok(vinylDTOs);
@@ -51,7 +53,9 @@ namespace WebAPI.Controllers
                 Artist = vinyl.Artist,
                 Title = vinyl.Title,
                 Price = vinyl.Price,
-                ImagePath = vinyl.ImagePath
+                ImagePath = vinyl.ImagePath,
+                GenreId = vinyl.GenreId,
+                GenreName = vinyl.GenreName
             };
 
             return Ok(vinylDTO);
@@ -59,23 +63,15 @@ namespace WebAPI.Controllers
 
         // PUT: api/Vinyls/{id}
         [HttpPut("{id}")]
-        public IActionResult UpdateVinyl(int id, VinylDto vinylDTO)
+        public IActionResult UpdateVinyl(int id, VinylDto vinylDto)
         {
-            if (id != vinylDTO.VinylId)
+            if (id != vinylDto.VinylId)
             {
                 return BadRequest();
             }
 
-            var vinyl = new Vinyl
-            {
-                VinylId = vinylDTO.VinylId,
-                Artist = vinylDTO.Artist,
-                Title = vinylDTO.Title,
-                Price = vinylDTO.Price,
-                ImagePath = vinylDTO.ImagePath
-            };
+            _vinylService.UpdateVinylBy(id, vinylDto);
 
-            _vinylService.UpdateVinylBy(id, vinylDTO);
             return NoContent();
         }
 
@@ -96,26 +92,18 @@ namespace WebAPI.Controllers
         [HttpPost]
         public ActionResult<VinylDto> CreateVinyl(VinylDto vinylDTO)
         {
-            var vinyl = new Vinyl
-            {
-                Artist = vinylDTO.Artist,
-                Title = vinylDTO.Title,
-                Price = vinylDTO.Price,
-                ImagePath = vinylDTO.ImagePath
-            };
+            var vinyl = _vinylService.CreateVinyl(vinylDTO);
 
-            _vinylService.CreateVinyl(vinylDTO);
-
-            var createdVinylDTO = new VinylDto
+            var newVinyl = new VinylDto
             {
                 VinylId = vinyl.VinylId,
                 Artist = vinyl.Artist,
                 Title = vinyl.Title,
                 Price = vinyl.Price,
-                ImagePath = vinyl.ImagePath
+                ImagePath = vinyl.ImagePath,
+                GenreId = vinyl.GenreId
             };
-
-            return CreatedAtAction(nameof(GetVinyl), new { id = createdVinylDTO.VinylId }, createdVinylDTO);
+            return CreatedAtAction(nameof(GetVinyl), new { id = newVinyl.VinylId }, newVinyl);
         }
     }
 }

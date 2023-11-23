@@ -1,0 +1,138 @@
+﻿@page "/VinylOverview"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager;
+@using global::Shared.DTOs;
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.Text.Json;
+
+<h3>Overview of Vinyls</h3>
+
+<EditForm Model="newVinyl" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="title">Title:</label>
+        <InputText id="title" @bind-Value="newVinyl.Title" class="form-control" placeholder="Enter vinyl name" />
+        <ValidationMessage For="@(() => newVinyl.Title)" />
+    </div>
+
+    <div class="form-group">
+        <label for="artist">Artist:</label>
+        <InputText id="artist" @bind-Value="newVinyl.Artist" class="form-control" placeholder="Enter artist" />
+        <ValidationMessage For="@(() => newVinyl.Artist)" />
+    </div>
+
+    <div class="form-group">
+        <label for="price">Price:</label>
+        <InputNumber id="price" @bind-Value="newVinyl.Price" class="form-control" placeholder="Enter price" />
+        <ValidationMessage For="@(() => newVinyl.Price)" />
+    </div>
+
+    <div class="form-group">
+        <label for="imagePath">Image Path:</label>
+        <InputText id="imagePath" @bind-Value="newVinyl.ImagePath" class="form-control"
+            placeholder="Enter image path" />
+        <ValidationMessage For="@(() => newVinyl.ImagePath)" />
+    </div>
+
+    <div class="form-group">
+        <label for="genre">Genre:</label>
+        <InputSelect id="genre" @bind-Value="newVinyl.GenreId" class="form-control">
+            <option value="">Select a genre...</option>
+            @foreach (var genre in _genres)
+            {
+                <option value="@genre.GenreId">@genre.GenreName</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => newVinyl.GenreId)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-1">Add New Vinyl</button>
+    <button class="btn btn-secondary mt-1" @onclick='() => NavigationManager.NavigateTo("/Admin")'>Back</button>
+</EditForm>
+
+@if (_vinyls == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Artist</th>
+            <th>Price</th>
+            <th>Genre</th>
+            <th>Actions</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var vinyl in _vinyls)
+            {
+                <tr>
+                    <td>@vinyl.VinylId</td>
+                    <td>@vinyl.Title</td>
+                    <td>@vinyl.Artist</td>
+                    <td>@vinyl.Price</td>
+                    <td>@vinyl.GenreName</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => UpdateVinyl(vinyl.VinylId)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteVinyl(vinyl.VinylId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<GenreDto> _genres = new List<GenreDto>();
+    private VinylDto[] _vinyls;
+    private VinylDto newVinyl = new VinylDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetAsync("api/Genres");
+        if (response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            _genres = JsonSerializer.Deserialize<List<GenreDto>>(responseBody, options);
+        }
+
+        _vinyls = await Http.GetFromJsonAsync<VinylDto[]>("api/vinyls");
+    }
+
+    private async Task HandleSubmit()
+    {
+        Console.WriteLine(JsonSerializer.Serialize(newVinyl));
+
+        var response = await Http.PostAsJsonAsync("api/vinyls", newVinyl);
+        if (response.IsSuccessStatusCode)
+        {
+            _vinyls = await Http.GetFromJsonAsync<VinylDto[]>("api/vinyls");
+            newVinyl = new VinylDto();
+        }
+        else
+        {
+            // Log the server's response
+            var errorResponse = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(errorResponse);
+        }
+    }
+
+    private void UpdateVinyl(int id)
+    {
+        Console.WriteLine($"Navigating to edit page for vinyl with ID: {id}");
+        NavigationManager.NavigateTo($"/editvinyl/{id}");
+    }
+
+    private async Task DeleteVinyl(int id)
+    {
+        var response = await Http.DeleteAsync($"api/vinyls/{id}");
+        _vinyls = await Http.GetFromJsonAsync<VinylDto[]>("api/vinyls");
+    }
+}

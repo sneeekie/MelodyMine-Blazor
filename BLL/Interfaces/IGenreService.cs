@@ -1,16 +1,13 @@
 using DataLayer.Models;
+using Shared.DTOs;
 
 namespace BLL.Interfaces;
 
 public interface IGenreService
 {
-    public IQueryable<Genre> GetAllGenres();
-    public IQueryable<Genre> GetGenresById(int genreId);
-    public IQueryable<VinylGenre> GetAllVinylGenres();
-    public void CreateVinylGenre(int VinylId, int GenreId);
-    void CreateGenre(Genre genre);
-    void UpdateGenre(Genre genre);
-    Task UpdateVinylGenreLink(int vinylId, int genreId);
-    bool DeleteGenre(int genreId);
-
+    Task<List<GenreDto>> GetAllGenres();
+    Task<GenreDto> GetGenresById(int genreId);
+    Task CreateGenre(GenreDto genreDto);
+    Task UpdateGenre(GenreDto genreDto);
+    Task<bool> DeleteGenre(int id);
 }
