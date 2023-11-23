@@ -59,19 +59,4 @@ public class GenreService : IGenreService
 
         return true;
     }
-
-    public IQueryable<VinylGenre> GetAllVinylGenres()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void CreateVinylGenre(int VinylId, int GenreId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UpdateVinylGenreLink(int vinylId, int genreId)
-    {
-        throw new NotImplementedException();
-    }
 }
