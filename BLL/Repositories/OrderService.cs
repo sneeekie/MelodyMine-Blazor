@@ -15,6 +15,33 @@ public class OrderService : IOrderService
         _context = melodyMineService;
     }
 
+    public OrderDto MapOrderToOrderDto(Order order)
+    {
+        return new OrderDto
+        {
+            OrderId = order.OrderId,
+            Email = order.Email,
+            BuyDate = order.BuyDate,
+            Address = new AddressDto
+            {
+                AddressId = order.Address.AddressId,
+                Postal = order.Address.Postal,
+                StreetNumber = order.Address.StreetNumber,
+                City = order.Address.City,
+                Country = order.Address.Country,
+                Street = order.Address.Street,
+                CardNumber = order.Address.CardNumber
+            },
+            OrderProductDetails = order.OrderProductDetails.Select(opd => new OrderProductDetailsDto
+            {
+                OrderProductDetailsId = opd.OrderProductDetailsId,
+                VinylId = opd.VinylId,
+                OrderId = opd.OrderId,
+                Quantity = opd.Quantity
+            }).ToList()
+        };
+    }
+
     public void CreateOrder(Order? order)
     {
         _context.Orders.Add(order);

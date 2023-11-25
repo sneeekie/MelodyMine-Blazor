@@ -5,6 +5,7 @@ namespace BLL.Interfaces;
 
 public interface IOrderService
 {
+    public OrderDto MapOrderToOrderDto(Order order);
     public void CreateOrder(Order? order);
     public void CreateOrderProductDetails(List<OrderProductDetails> orderProductDetails);
     public int CreateAddress(Address address);
