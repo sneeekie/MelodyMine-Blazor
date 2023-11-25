@@ -2,6 +2,7 @@ using BLL.Interfaces;
 using DataLayer.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Shared.DTOs;
 
 namespace WebAPI.Controllers;
 
@@ -25,14 +26,17 @@ public class OrdersController : ControllerBase
 
     // GET: api/Orders/{id}
     [HttpGet("{id}")]
-    public ActionResult<Order> GetOrder(int id)
+    public ActionResult<OrderDto> GetOrder(int id)
     {
         var order = _orderService.GetSingleFullOrderBy(id);
         if (order == null)
         {
             return NotFound();
         }
-        return Ok(order);
+
+        var orderDto = _orderService.MapOrderToOrderDto(order);
+
+        return Ok(orderDto);
     }
 
     // POST: api/Orders
@@ -45,12 +49,22 @@ public class OrdersController : ControllerBase
 
     // PUT: api/Orders/{id}
     [HttpPut("{id}")]
-    public IActionResult UpdateOrder(int id, Order order)
+    public IActionResult UpdateOrder(int id, OrderDto orderDto)
     {
-        if (id != order.OrderId)
+        var order = _orderService.GetSingleFullOrderBy(id);
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        if (id != orderDto.OrderId)
         {
             return BadRequest();
         }
+
+        order.Email = orderDto.Email;
+        order.BuyDate = orderDto.BuyDate;
+
         _orderService.UpdateOrderById(id, order);
         return NoContent();
     }
