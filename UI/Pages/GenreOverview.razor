@@ -1,0 +1,58 @@
+﻿@page "/genreoverview"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager;
+@using global::Shared.DTOs;
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.Text.Json;
+
+<h3>Genre Overview</h3>
+
+@if (genres == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Genre Id</th>
+                <th>Genre Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var genre in genres)
+            {
+                <tr>
+                    <td>@genre.GenreId</td>
+                    <td>@genre.GenreName</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => UpdateGenre(genre.GenreId)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteGenre(genre.GenreId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<GenreDto> genres;
+
+    protected override async Task OnInitializedAsync()
+    {
+        genres = await Http.GetFromJsonAsync<List<GenreDto>>("api/genres");
+    }
+
+    private void UpdateGenre(int genreId)
+    {
+        NavigationManager.NavigateTo($"/EditGenre/{genreId}");
+    }
+
+    private async void DeleteGenre(int genreId)
+    {
+        var response = await Http.DeleteAsync($"api/Genres/{genreId}");
+        genres = await Http.GetFromJsonAsync<List<GenreDto>>("api/genres");
+    }
+}
