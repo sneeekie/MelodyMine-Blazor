@@ -1,0 +1,58 @@
+﻿@page "/EditGenre/{GenreId}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@using global::Shared.DTOs
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Text.Json
+
+<h3>Edit Genre</h3>
+
+@if (genre == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="genre" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="genreId">Genre ID:</label>
+        <p id="genreId">@genre.GenreId</p>
+    </div>
+
+    <div class="form-group">
+        <label for="genreName">Genre Name:</label>
+        <InputText id="genreName" class="form-control" @bind-Value="genre.GenreName" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+}
+
+@code {
+    [Parameter]
+    public string GenreId { get; set; }
+
+    private GenreDto genre;
+
+    protected override async Task OnInitializedAsync()
+    {
+        genre = await Http.GetFromJsonAsync<GenreDto>($"api/genres/{int.Parse(GenreId)}");
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        var response = await Http.PutAsJsonAsync($"api/genres/{int.Parse(GenreId)}", genre);
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/GenreOverview");
+        }
+        else
+        {
+            // Handle error
+        }
+    }
+}
