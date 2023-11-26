@@ -13,6 +13,18 @@
         <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search..." class="form-control mb-3" />
     </div>
 </div>
+
+<div class="row">
+    <div class="col-sm-1 offset-lg-3">
+        <select @onchange="SortVinyls" class="form-control mb-3">
+            <option value="">Sort by...</option>
+            <option value="Title">Title</option>
+            <option value="Artist">Artist</option>
+            <option value="Price">Price</option>
+        </select>
+    </div>
+</div>
+
 <div class="container-fluid mt-4">
     <div class="row">
         @foreach (var vinyl in filteredVinyls)
@@ -79,5 +91,24 @@
             cartItems.Add(new ShoppingCartItemDto { VinylId = vinyl.VinylId, Quantity = 1, Price = vinyl.Price });
         }
         await SaveCartItems(cartItems);
+    }
+
+    private void SortVinyls(ChangeEventArgs e)
+    {
+        var value = e.Value.ToString();
+        switch (value)
+        {
+            case "Title":
+                _vinyls = _vinyls.OrderBy(v => v.Title).ToList();
+                break;
+            case "Artist":
+                _vinyls = _vinyls.OrderBy(v => v.Artist).ToList();
+                break;
+            case "Price":
+                _vinyls = _vinyls.OrderBy(v => v.Price).ToList();
+                break;
+            default:
+                break;
+        }
     }
 }
