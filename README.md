@@ -1,68 +1,73 @@
+# `MelodyMine Blazor-Project`
 
-# Project Template
+## Introduction
 
-This project template is designed to provide a starting point for .NET 7 projects using a layered architecture with a WebAPI, a Blazor WebAssembly client, and separate class library projects for Business Logic Layer (BLL) and Data Access Layer (DAL).
+**ADJUST:**
+Discover and manage a diverse collection of vinyl records across genres in our user-friendly online store with an integrated administrative panel for seamless inventory and order management.
 
-## Forking the Template
+## Getting Started
 
-To use this template for a new project, you can fork the repository and then clone it to your local machine.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-```bash
-$ git clone https://github.com/your-username/Project-Template.git
-$ cd Project-Template
-```
+### Prerequisites
 
-## Setup Instructions
+Before you begin, ensure you have the following installed:
+- Git (for cloning the repository)
+- .NET SDK (required to build and run the project)
 
-1. **Database Configuration:**
-   Update the connection string in `appsettings.json` and `appsettings.Development.json` to match your database settings.
+### Installing
 
-2. **Install Dependencies:**
-   Ensure that all NuGet packages are restored properly by running:
+Follow these steps to get your development environment set up:
+
+1. **Clone the repository:**
+   ```bash
+   $ https://github.com/sneeekie/MelodyMine-Blazor.git
+   ```
+2. **Build the project:**
+   Navigate to the root of the project directory and run:
+   ```bash
+   MelodyMine-Blazor/ $ dotnet build
+   ```
+   This command will compile the project and its dependencies.
+
+3. **Run the application:**
+   After building the project, move to the MelodyMine-Blazor directory and start the application with the following command:
+   ```bash
+   MelodyMine-Blazor/UI/ $ dotnet watch
+   ```
+   This will start the server and begin watching for any changes in the source code, automatically reloading the server when changes are detected.
+
+## Running the tests
+
+To ensure the quality and functionality of MelodyMine application, we employ a suite of tests written with xUnit. Follow these steps to execute the tests:
+
+### Running xUnit tests
+
+1. **Navigate to the test directory:**
+   From the root of your project, change directories to the xUnit test folder:
 
    ```bash
-   $ dotnet restore
+   MelodyMine-Blazor/ $ cd Test
    ```
-
-3. **Run Migrations:**
-   Apply the Entity Framework migrations to create your database schema:
-
+2. **Execute the tests:**
+   Run the following command to execute the tests:
    ```bash
-   $ dotnet ef database update
+   MelodyMine-Blazor/Test/ $ dotnet test
    ```
+This command will discover and run all the tests in the project. Output will be provided in the terminal indicating whether the tests passed or failed, along with any other relevant information.
 
-4. **Run the Projects:**
-   Start the WebAPI and the Blazor WebAssembly projects:
+## Built With
 
-   ```bash
-   $ dotnet run --project ./WebAPI/WebAPI.csproj
-   $ dotnet run --project ./UI/UI.csproj
-   ```
-
-## Development Notes
-
-- When developing, use the development app settings provided in `appsettings.Development.json`.
-- For testing, configure and run the xUnit test project using your preferred test runner.
-- Use the provided `swagger` configuration to test your WebAPI endpoints.
-
-## Customization
-
-- Modify the `MappingProfile` in the BLL project to define object mappings.
-- Implement your business logic in the services defined under the BLL project's `Services` folder.
-
-## Deployment
-
-Before deploying the application, ensure the production connection string and any other environment-specific settings are configured correctly in the production app settings file.
+* [Entity Framework](https://docs.microsoft.com/en-us/ef/) - The object-relational mapper (ORM) used for data access
+* [Npgsql](http://www.npgsql.org/) - A .NET data provider for PostgreSQL used in conjunction with Entity Framework
+* [.NET](https://dotnet.microsoft.com/) - The framework used for building the application
+* [xUnit](https://xunit.net/) - The testing framework used for running unit tests
+* [Git](https://git-scm.com/) - Used for version control
 
 ## Contributing
 
-If you wish to contribute to the template, consider the following steps:
-
-1. Create a branch for your feature or fix.
-2. Implement your changes.
-3. Write tests to cover the new functionality.
-4. Create a pull request targeting the main branch.
+We welcome contributions to the MelodyMine project. For details on how to contribute, please read our [contributing guidelines](docs/CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
