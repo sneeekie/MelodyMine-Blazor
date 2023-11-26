@@ -121,10 +121,11 @@
 
         if (response.IsSuccessStatusCode)
         {
+            var createdOrder = await response.Content.ReadFromJsonAsync<OrderDto>();
             CartItems.Clear();
             var emptyCartJson = JsonSerializer.Serialize(CartItems);
             await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "cart", emptyCartJson);
-            NavigationManager.NavigateTo($"/confirmation/{NewOrder.OrderId}");
+            NavigationManager.NavigateTo($"/confirmation/{createdOrder.OrderId}");
         }
     }
 }
