@@ -1,0 +1,110 @@
+@page "/vinyls"
+@using global::Shared.DTOs
+@inject HttpClient HttpClient
+@using System.Text.Json;
+@inject IJSRuntime JSRuntime
+
+<div class="row">
+    <div class="col-lg-6 offset-lg-3">
+        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search..." class="form-control mb-3" />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-1 offset-lg-3">
+        <select @onchange="SortVinyls" class="form-control mb-3">
+            <option value="">Sort by...</option>
+            <option value="Title">Title</option>
+            <option value="Artist">Artist</option>
+            <option value="Price">Price</option>
+        </select>
+    </div>
+</div>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        @foreach (var vinyl in filteredVinyls)
+        {
+                <div class="col-lg-3 my-2">
+                    <div class="card">
+                    @if (!string.IsNullOrEmpty(vinyl.ImagePath))
+                    {
+                                <img src="@vinyl.ImagePath" class="card-img-top" alt="Cover for @vinyl.Title">
+                    }
+                        <div class="card-body">
+                            <h5 class="card-title">@vinyl.Title</h5>
+                            <p class="card-text">@vinyl.Artist</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="font-weight-bold">kr. @vinyl.Price</div>
+                                <div class="btn-group">
+                                    <button type="button" @onclick="() => AddToCart(vinyl)"
+                                        class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Inject] private ILogger<Shop> _logger { get; init; } = default!;
+    private List<VinylDto> _vinyls = new List<VinylDto>();
+    private string searchTerm = string.Empty;
+
+    private IEnumerable<VinylDto> filteredVinyls => _vinyls
+        .Where(vinyl => string.IsNullOrEmpty(searchTerm) || vinyl.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        _vinyls = await HttpClient.GetFromJsonAsync<List<VinylDto>>("api/vinyls");
+    }
+
+    private async Task<List<ShoppingCartItemDto>> GetCartItems()
+    {
+        var json = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "cart");
+        return string.IsNullOrEmpty(json) ? new List<ShoppingCartItemDto>() :
+        JsonSerializer.Deserialize<List<ShoppingCartItemDto>>(json);
+    }
+
+    private async Task SaveCartItems(List<ShoppingCartItemDto> cartItems)
+    {
+        var json = JsonSerializer.Serialize(cartItems);
+        await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "cart", json);
+    }
+
+    private async Task AddToCart(VinylDto vinyl)
+    {
+        var cartItems = await GetCartItems();
+        var cartItem = cartItems.FirstOrDefault(item => item.VinylId == vinyl.VinylId);
+        if (cartItem != null)
+        {
+            cartItem.Quantity++;
+        }
+        else
+        {
+            cartItems.Add(new ShoppingCartItemDto { VinylId = vinyl.VinylId, Quantity = 1, Price = vinyl.Price });
+        }
+        await SaveCartItems(cartItems);
+    }
+
+    private void SortVinyls(ChangeEventArgs e)
+    {
+        var value = e.Value.ToString();
+        switch (value)
+        {
+            case "Title":
+                _vinyls = _vinyls.OrderBy(v => v.Title).ToList();
+                break;
+            case "Artist":
+                _vinyls = _vinyls.OrderBy(v => v.Artist).ToList();
+                break;
+            case "Price":
+                _vinyls = _vinyls.OrderBy(v => v.Price).ToList();
+                break;
+            default:
+                break;
+        }
+    }
+}

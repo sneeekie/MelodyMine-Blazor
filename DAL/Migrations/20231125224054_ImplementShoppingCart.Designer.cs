@@ -3,6 +3,7 @@ using System;
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(EfDbContext))]
-    partial class EfDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231125224054_ImplementShoppingCart")]
+    partial class ImplementShoppingCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,6 +170,32 @@ namespace DAL.Migrations
                         });
                 });
 
+            modelBuilder.Entity("DataLayer.Models.ShoppingCartItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("VinylId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShoppingCartItems");
+                });
+
             modelBuilder.Entity("DataLayer.Models.Vinyl", b =>
                 {
                     b.Property<int>("VinylId")
@@ -278,14 +307,14 @@ namespace DAL.Migrations
                         {
                             OrderId = 1,
                             AddressId = 1,
-                            BuyDate = new DateTime(2023, 11, 25, 23, 38, 22, 495, DateTimeKind.Utc).AddTicks(890),
+                            BuyDate = new DateTime(2023, 11, 25, 22, 40, 54, 684, DateTimeKind.Utc).AddTicks(4470),
                             Email = "john@example.com"
                         },
                         new
                         {
                             OrderId = 2,
                             AddressId = 2,
-                            BuyDate = new DateTime(2023, 11, 25, 23, 38, 22, 495, DateTimeKind.Utc).AddTicks(890),
+                            BuyDate = new DateTime(2023, 11, 25, 22, 40, 54, 684, DateTimeKind.Utc).AddTicks(4470),
                             Email = "adrian@example.com"
                         });
                 });

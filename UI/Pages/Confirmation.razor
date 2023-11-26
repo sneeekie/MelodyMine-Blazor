@@ -1,0 +1,40 @@
+﻿@page "/confirmation/{OrderId}"
+@inject HttpClient Http
+@using global::Shared.DTOs;
+@using System.Net.Http.Json;
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            @if (Order == null)
+            {
+                <p>Loading...</p>
+            }
+            else
+            {
+                <div class="card text-center">
+                    <div class="card-header">
+                        <h2>Thank You for Your Order!</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Your order has been successfully placed.</p>
+                        <p class="card-text"><strong>Order ID:</strong> @OrderId</p>
+                        <p class="card-text"><strong>Email Address:</strong> @Order.Email</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string OrderId { get; set; }
+
+    public OrderDto Order { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Order = await Http.GetFromJsonAsync<OrderDto>($"/api/orders/{OrderId}");
+    }
+}

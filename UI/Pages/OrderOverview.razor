@@ -1,0 +1,61 @@
+﻿@page "/OrderOverview"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager;
+@using global::Shared.DTOs;
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.Text.Json;
+
+<h3>Order Overview</h3>
+
+@if (orders == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Order Date</th>
+            <th>Actioms</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in orders)
+            {
+                <tr>
+                    <td>@order.OrderId</td>
+                    <td>@order.Email</td>
+                    <td>@order.BuyDate</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => UpdateOrder(order.OrderId)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteOrder(order.OrderId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+        <button class="btn btn-secondary mt-1" @onclick='() => NavigationManager.NavigateTo("/Admin")'>Back</button>
+}
+
+@code {
+    private List<OrderDto> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        orders = await Http.GetFromJsonAsync<List<OrderDto>>("api/Orders");
+    }
+
+    private void UpdateOrder(int orderId)
+    {
+        NavigationManager.NavigateTo($"/EditOrder/{orderId}");
+    }
+
+    private async void DeleteOrder(int orderId)
+    {
+        var response = await Http.DeleteAsync($"api/Orders/{orderId}");
+        orders = await Http.GetFromJsonAsync<List<OrderDto>>("api/Orders");
+    }
+}

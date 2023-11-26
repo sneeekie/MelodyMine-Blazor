@@ -1,0 +1,83 @@
+﻿@page "/genreoverview"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager;
+@using global::Shared.DTOs;
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.Text.Json;
+
+<h3>Genre Overview</h3>
+
+<EditForm Model="newGenre" OnValidSubmit="HandleSubmit">
+    <div class="form-group">
+        <label for="genreName">Genre name:</label>
+        <InputText id="genreName" class="form-control" @bind-Value="newGenre.GenreName" />
+    </div>
+    <button type="submit" class="btn btn-primary mt-1">Add New Genre</button>
+    <button class="btn btn-secondary mt-1" @onclick='() => NavigationManager.NavigateTo("/Admin")'>Back</button>
+</EditForm>
+
+@if (genres == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Genre name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var genre in genres)
+            {
+                <tr>
+                    <td>@genre.GenreId</td>
+                    <td>@genre.GenreName</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => UpdateGenre(genre.GenreId)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteGenre(genre.GenreId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<GenreDto> genres;
+    private GenreDto newGenre = new GenreDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        genres = await Http.GetFromJsonAsync<List<GenreDto>>("api/genres");
+    }
+
+    private void UpdateGenre(int genreId)
+    {
+        NavigationManager.NavigateTo($"/EditGenre/{genreId}");
+    }
+
+    private async void DeleteGenre(int genreId)
+    {
+        var response = await Http.DeleteAsync($"api/Genres/{genreId}");
+        genres = await Http.GetFromJsonAsync<List<GenreDto>>("api/genres");
+    }
+
+    private async Task HandleSubmit()
+    {
+        var response = await Http.PostAsJsonAsync("api/genres", newGenre);
+        if (response.IsSuccessStatusCode)
+        {
+            genres = await Http.GetFromJsonAsync<List<GenreDto>>("api/genres");
+            newGenre = new GenreDto();
+        }
+        else
+        {
+            var errorResponse = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(errorResponse);
+        }
+    }
+}

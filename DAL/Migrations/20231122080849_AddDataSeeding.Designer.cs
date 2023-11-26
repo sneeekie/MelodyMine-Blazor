@@ -3,6 +3,7 @@ using System;
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(EfDbContext))]
-    partial class EfDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231122080849_AddDataSeeding")]
+    partial class AddDataSeeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,7 +182,8 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("GenreId")
+                    b.Property<int?>("GenreId")
+                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.Property<string>("ImagePath")
@@ -194,8 +198,6 @@ namespace DAL.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("VinylId");
-
-                    b.HasIndex("GenreId");
 
                     b.ToTable("Vinyls");
 
@@ -247,6 +249,48 @@ namespace DAL.Migrations
                         });
                 });
 
+            modelBuilder.Entity("DataLayer.Models.VinylGenre", b =>
+                {
+                    b.Property<int>("VinylId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("GenreId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("VinylId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("VinylGenres");
+
+                    b.HasData(
+                        new
+                        {
+                            VinylId = 1,
+                            GenreId = 1
+                        },
+                        new
+                        {
+                            VinylId = 2,
+                            GenreId = 2
+                        },
+                        new
+                        {
+                            VinylId = 3,
+                            GenreId = 2
+                        },
+                        new
+                        {
+                            VinylId = 4,
+                            GenreId = 3
+                        },
+                        new
+                        {
+                            VinylId = 5,
+                            GenreId = 4
+                        });
+                });
+
             modelBuilder.Entity("Order", b =>
                 {
                     b.Property<int>("OrderId")
@@ -278,14 +322,14 @@ namespace DAL.Migrations
                         {
                             OrderId = 1,
                             AddressId = 1,
-                            BuyDate = new DateTime(2023, 11, 25, 23, 38, 22, 495, DateTimeKind.Utc).AddTicks(890),
+                            BuyDate = new DateTime(2023, 11, 22, 8, 8, 49, 509, DateTimeKind.Utc).AddTicks(8340),
                             Email = "john@example.com"
                         },
                         new
                         {
                             OrderId = 2,
                             AddressId = 2,
-                            BuyDate = new DateTime(2023, 11, 25, 23, 38, 22, 495, DateTimeKind.Utc).AddTicks(890),
+                            BuyDate = new DateTime(2023, 11, 22, 8, 8, 49, 509, DateTimeKind.Utc).AddTicks(8340),
                             Email = "adrian@example.com"
                         });
                 });
@@ -309,15 +353,23 @@ namespace DAL.Migrations
                     b.Navigation("Vinyl");
                 });
 
-            modelBuilder.Entity("DataLayer.Models.Vinyl", b =>
+            modelBuilder.Entity("DataLayer.Models.VinylGenre", b =>
                 {
                     b.HasOne("DataLayer.Models.Genre", "Genre")
-                        .WithMany("Vinyls")
+                        .WithMany("VinylGenres")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DataLayer.Models.Vinyl", "Vinyl")
+                        .WithMany("VinylGenres")
+                        .HasForeignKey("VinylId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Genre");
+
+                    b.Navigation("Vinyl");
                 });
 
             modelBuilder.Entity("Order", b =>
@@ -333,7 +385,12 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DataLayer.Models.Genre", b =>
                 {
-                    b.Navigation("Vinyls");
+                    b.Navigation("VinylGenres");
+                });
+
+            modelBuilder.Entity("DataLayer.Models.Vinyl", b =>
+                {
+                    b.Navigation("VinylGenres");
                 });
 
             modelBuilder.Entity("Order", b =>
