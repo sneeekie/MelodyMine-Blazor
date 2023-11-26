@@ -1,0 +1,130 @@
+﻿@page "/shoppingcart"
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject NavigationManager NavigationManager;
+@using global::Shared.DTOs;
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.Text
+@using System.Text.Json;
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Shipping address</h2>
+        <EditForm Model="NewOrder" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <div class="form-group">
+                    <label for="street">Street:</label>
+                    <InputText id="street" class="form-control" @bind-Value="NewOrder.Address.Street" />
+                    <ValidationMessage For="@(() => NewOrder.Address.Street)" />
+                </div>
+                <div class="form-group">
+                    <label for="streetNumber">Street Number:</label>
+                    <InputNumber id="streetNumber" class="form-control" @bind-Value="NewOrder.Address.StreetNumber" />
+                    <ValidationMessage For="@(() => NewOrder.Address.StreetNumber)" />
+                </div>
+                <div class="form-group">
+                    <label for="postal">Postal:</label>
+                    <InputNumber id="postal" class="form-control" @bind-Value="NewOrder.Address.Postal" />
+                    <ValidationMessage For="@(() => NewOrder.Address.Postal)" />
+                </div>
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <InputText id="city" class="form-control" @bind-Value="NewOrder.Address.City" />
+                    <ValidationMessage For="@(() => NewOrder.Address.City)" />
+                </div>
+                <div class="form-group">
+                    <label for="country">Country:</label>
+                    <InputText id="country" class="form-control" @bind-Value="NewOrder.Address.Country" />
+                    <ValidationMessage For="@(() => NewOrder.Address.Country)" />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <InputText id="email" class="form-control" @bind-Value="NewOrder.Email" />
+                    <ValidationMessage For="@(() => NewOrder.Email)" />
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Card Number:</label>
+                    <InputText id="cardNumber" class="form-control" @bind-Value="NewOrder.Address.CardNumber" />
+                    <ValidationMessage For="@(() => NewOrder.Address.CardNumber)" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success mt-1">Checkout</button>
+            <button @onclick='() => NavigationManager.NavigateTo("/vinyls")' class="btn btn-secondary mt-1">Continue
+                Shopping</button>
+        </EditForm>
+    </div>
+    <div class="col-md-6">
+        <h2>Shopping Cart</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Sum</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in CartItems)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Price</td>
+                        <td>@(item.Price * item.Quantity)</td>
+                        <td>
+                            <button @onclick="() => RemoveFromCart(item)" class="btn btn-danger">Remove</button>
+                        </td>
+                    </tr>
+                }
+                <span class="float-start fw-bold">Total: @CartItems.Sum(item => item.Price * item.Quantity)</span>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<ShoppingCartItemDto> CartItems = new List<ShoppingCartItemDto>();
+    private OrderDto NewOrder = new OrderDto { Address = new AddressDto() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var json = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "cart");
+        if (!string.IsNullOrEmpty(json))
+        {
+            CartItems = JsonSerializer.Deserialize<List<ShoppingCartItemDto>>(json);
+        }
+    }
+
+    private async Task RemoveFromCart(ShoppingCartItemDto item)
+    {
+        CartItems.Remove(item);
+        var json = JsonSerializer.Serialize(CartItems);
+        await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "cart", json);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        NewOrder.OrderProductDetails = CartItems.Select(item => new OrderProductDetailsDto
+            {
+                VinylId = item.VinylId,
+                Quantity = item.Quantity,
+                Price = item.Price
+            }).ToList();
+
+        var json = JsonSerializer.Serialize(NewOrder);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var response = await Http.PostAsync("/api/orders", content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            CartItems.Clear();
+            var emptyCartJson = JsonSerializer.Serialize(CartItems);
+            await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "cart", emptyCartJson);
+            NavigationManager.NavigateTo($"/confirmation/{NewOrder.OrderId}");
+        }
+    }
+}

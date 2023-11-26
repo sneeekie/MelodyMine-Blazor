@@ -41,8 +41,32 @@ public class OrdersController : ControllerBase
 
     // POST: api/Orders
     [HttpPost]
-    public ActionResult<Order> CreateOrder(Order order)
+    public ActionResult<Order> CreateOrder(OrderDto orderDto)
     {
+        var order = new Order
+        {
+            OrderId = orderDto.OrderId,
+            Email = orderDto.Email,
+            BuyDate = orderDto.BuyDate,
+            Address = new Address
+            {
+                AddressId = orderDto.Address.AddressId,
+                Postal = orderDto.Address.Postal,
+                StreetNumber = orderDto.Address.StreetNumber,
+                City = orderDto.Address.City,
+                Country = orderDto.Address.Country,
+                Street = orderDto.Address.Street,
+                CardNumber = orderDto.Address.CardNumber
+            },
+            OrderProductDetails = orderDto.OrderProductDetails.Select(opd => new OrderProductDetails
+            {
+                OrderProductDetailsId = opd.OrderProductDetailsId,
+                VinylId = opd.VinylId,
+                OrderId = opd.OrderId,
+                Quantity = opd.Quantity
+            }).ToList()
+        };
+
         _orderService.CreateOrder(order);
         return CreatedAtAction(nameof(GetOrder), new { id = order.OrderId }, order);
     }

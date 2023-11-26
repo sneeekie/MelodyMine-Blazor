@@ -1,6 +1,8 @@
 @page "/vinyls"
 @using global::Shared.DTOs
 @inject HttpClient HttpClient
+@using System.Text.Json;
+@inject IJSRuntime JSRuntime
 
 <h3>Vinyls</h3>
 
@@ -22,7 +24,8 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="font-weight-bold">kr. @vinyl.Price</div>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                                <button type="button" @onclick="() => AddToCart(vinyl)"
+                                    class="btn btn-sm btn-outline-primary">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -35,45 +38,37 @@
 @code {
     [Inject] private ILogger<Shop> _logger { get; init; } = default!;
     private List<VinylDto> _vinyls = new List<VinylDto>();
-    private int currentPage = 1;
-    private int totalPages = 1;
-
-    string sortField = null;
-    bool sortAscending = true;
-    string searchTerm;
-    string genreId;
-    string titleSort;
-    string priceSort;
 
     protected override async Task OnInitializedAsync()
     {
         _vinyls = await HttpClient.GetFromJsonAsync<List<VinylDto>>("api/vinyls");
-        await GetVinyls(currentPage);
     }
 
-    private async Task GetVinyls(int page, string sortField = null, bool sortAscending = true)
+    private async Task<List<ShoppingCartItemDto>> GetCartItems()
     {
-        try
-        {
-            var response = await
-            HttpClient.GetAsync($"http://localhost:5225/api/vinyls?page={page}&searchTerm={searchTerm}&sortField={sortField}&sortAscending={sortAscending}");
+        var json = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "cart");
+        return string.IsNullOrEmpty(json) ? new List<ShoppingCartItemDto>() :
+        JsonSerializer.Deserialize<List<ShoppingCartItemDto>>(json);
+    }
 
-            if (response.IsSuccessStatusCode)
-            {
-                var json = await response.Content.ReadAsStringAsync();
-                _vinyls = await response.Content.ReadFromJsonAsync<List<VinylDto>>();
+    private async Task SaveCartItems(List<ShoppingCartItemDto> cartItems)
+    {
+        var json = JsonSerializer.Serialize(cartItems);
+        await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "cart", json);
+    }
 
-                currentPage = page;
-                totalPages = int.Parse(response.Headers.GetValues("totalPages").FirstOrDefault());
-            }
-            else
-            {
-                Console.WriteLine($"Error: {response.StatusCode}");
-            }
-        }
-        catch (Exception ex)
+    private async Task AddToCart(VinylDto vinyl)
+    {
+        var cartItems = await GetCartItems();
+        var cartItem = cartItems.FirstOrDefault(item => item.VinylId == vinyl.VinylId);
+        if (cartItem != null)
         {
-            Console.WriteLine($"Exception: {ex.Message}");
+            cartItem.Quantity++;
         }
+        else
+        {
+            cartItems.Add(new ShoppingCartItemDto { VinylId = vinyl.VinylId, Quantity = 1, Price = vinyl.Price });
+        }
+        await SaveCartItems(cartItems);
     }
 }
